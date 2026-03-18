@@ -2,7 +2,15 @@
 
 O **BusTracker** é uma solução Full Stack real, idealizada e desenvolvida para monitorar o transporte escolar no Sertão da Bahia. O sistema permite que motoristas enviem sua localização em tempo real e que pais/responsáveis acompanhem o trajeto, velocidade e estimativa de chegada diretamente pelo celular.
 
-> **Nota de Desenvolvimento:** Este projeto foi uma ideia totalmente minha, unindo a necessidade da minha região com as tecnologias que estou estudando no IFBA Campus Paulo Afonso. No processo de desenvolvimento, utilizei o **Claude (Anthropic)** como um parceiro de programação (Pair Programming) para agilizar a criação de telas e auxiliar no debugging, enquanto foquei na arquitetura do backend, lógica de persistência e infraestrutura Linux Ubuntu.
+## 🚀 Sobre o Desenvolvimento (Realidade do Projeto)
+
+Este projeto é fruto de uma iniciativa **totalmente autoral**, unindo a necessidade real da região de **Paulo Afonso-BA** com as tecnologias que venho dominando no **IFBA**. 
+
+A construção do **BusTracker PA** seguiu uma dinâmica de mercado moderna:
+
+* **Arquitetura e Ideação:** Toda a estrutura do sistema, desde a modelagem do banco de dados em Java (Spring Boot) até a lógica de rastreamento, foi idealizada por mim.
+* **Pair Programming com IA:** No processo de codificação, utilizei o **Claude (Anthropic)** como meu parceiro de programação. Ele foi essencial para agilizar a criação das interfaces no Flutter e auxiliar no debugging de ambiente no **Linux Ubuntu**, permitindo que eu focasse 100% na lógica de negócio e na integração do ecossistema.
+* **Propósito:** Estou muito animado com o potencial desse projeto! Aplicar o que aprendi em Lógica de Programação e Java para resolver um problema do meu cotidiano é o que me motiva a evoluir como desenvolvedor.
 
 ---
 
