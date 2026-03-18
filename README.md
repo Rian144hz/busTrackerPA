@@ -53,8 +53,8 @@ O sistema conta com interfaces distintas e intuitivas para cada tipo de usuário
 ### 🛠️ Tecnologias Utilizadas
 
 #### **Backend (Java Spring Boot)**
-* **Linguagem:** Java 17
-* **Framework:** Spring Boot 3.2 (Spring Data JPA)
+* **Linguagem:** Java 21
+* **Framework:** Spring Boot 3.5.12 (Spring Data JPA)
 * **Banco de Dados:** PostgreSQL (Gerenciado via DBeaver)
 * **Produtividade:** Lombok para redução de código boilerplate.
 * **Infraestrutura:** Servidor rodando em **Linux Ubuntu** com túnel reverso via **Ngrok** para testes externos em rede móvel (4G).
