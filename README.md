@@ -33,19 +33,19 @@ O sistema conta com interfaces distintas e intuitivas para cada tipo de usuário
 ### 🏠 Fluxo de Acesso
 | Seleção de Perfil | Cadastro Motorista | Cadastro Pai / Responsável |
 |:---:|:---:|:---:|
-| <img src="screenshotsapp/opcao_motorista.jpeg" width="250"> | <img src="screenshots/cadastro_motorista.jpeg" width="250"> | <img src="screenshots/cadastro_pai.jpeg" width="250"> |
+| <img src="screenshotsapp/opcao_motorista.jpeg" width="250"> | <img src="screenshotsapp/cadastro_motorista.jpeg" width="250"> | <img src="screenshotsapp/cadastro_pai.jpeg" width="250"> |
 | Escolha entre os perfis | Identificação por Nome e Placa | Acesso via Matrícula e Nome |
 
 ### 🚛 Interface do Motorista (Em Rota)
 | Aguardando Início | Localização Enviada | Alerta de Atraso | Opções de Atraso |
 |:---:|:---:|:---:|:---:|
-| <img src="screenshots/tela_motorista.jpeg" width="200"> | <img src="screenshots/tela_enviando_localizacao.jpeg" width="200"> | <img src="screenshots/tela_atraso.jpeg" width="200"> | <img src="screenshots/opcoes_atrasos.jpeg" width="200"> |
+| <img src="screenshotsapp/tela_motorista.jpeg" width="200"> | <img src="screenshotsapp/tela_enviando_localizacao.jpeg" width="200"> | <img src="screenshotsapp/tela_atraso.jpeg" width="200"> | <img src="screenshotsapp/opcoes_atrasos.jpeg" width="200"> |
 | Mapa de Paulo Afonso | Confirmação de envio ao Java | Status de atraso ativo | Motivos pré-definidos |
 
 ### 👨‍👩‍👦 Interface dos Pais (Acompanhamento)
 | Monitoramento ao Vivo | Falha de Conexão (Tratamento de Erro) |
 |:---:|:---:|
-| <img src="screenshots/tela_pai.jpeg" width="250"> | <img src="screenshots/tela_localizacao_falhou.jpeg" width="250"> |
+| <img src="screenshotsapp/tela_pai.jpeg" width="250"> | <img src="screenshotsapp/tela_localizacao_falhou.jpeg" width="250"> |
 | Visualização do ônibus e velocidade | Feedback em tempo real sobre instabilidades |
 
 ---
