@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'tela_motorista.dart';
 import 'tela_pai.dart';
+import '../service/auth_service.dart';
 
 class TelaSelecaoPerfil extends StatelessWidget {
   const TelaSelecaoPerfil({super.key});
@@ -60,7 +61,6 @@ class TelaSelecaoPerfil extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
 
-                // ── Card Motorista ─────────────────────────────
                 _PerfilCard(
                   icon: Icons.drive_eta,
                   titulo: 'Motorista',
@@ -70,7 +70,6 @@ class TelaSelecaoPerfil extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // ── Card Pai / Responsável ─────────────────────
                 _PerfilCard(
                   icon: Icons.family_restroom_rounded,
                   titulo: 'Pai / Responsável',
@@ -86,7 +85,7 @@ class TelaSelecaoPerfil extends StatelessWidget {
     );
   }
 
-  // ── Dialog de login do Motorista ──────────────────────────────
+  // ── Dialog Motorista ──────────────────────────────────────────
   void _mostrarDialogMotorista(BuildContext context) {
     final nomeCtrl = TextEditingController();
     final placaCtrl = TextEditingController();
@@ -94,8 +93,7 @@ class TelaSelecaoPerfil extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
             Icon(Icons.drive_eta, color: Color(0xFF1565C0)),
@@ -112,8 +110,7 @@ class TelaSelecaoPerfil extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Nome completo',
                 prefixIcon: const Icon(Icons.person_outline),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 12),
@@ -123,10 +120,8 @@ class TelaSelecaoPerfil extends StatelessWidget {
               decoration: InputDecoration(
                 labelText: 'Placa do veículo',
                 hintText: 'Ex: ABC-1234',
-                prefixIcon:
-                    const Icon(Icons.directions_bus_outlined),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.directions_bus_outlined),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
           ],
@@ -140,9 +135,7 @@ class TelaSelecaoPerfil extends StatelessWidget {
             onPressed: () {
               final nome = nomeCtrl.text.trim();
               final placa = placaCtrl.text.trim();
-
               if (nome.isEmpty || placa.isEmpty) return;
-
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -157,8 +150,7 @@ class TelaSelecaoPerfil extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1565C0),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('Entrar'),
           ),
@@ -167,85 +159,132 @@ class TelaSelecaoPerfil extends StatelessWidget {
     );
   }
 
-  // ── Dialog de login do Pai ────────────────────────────────────
+  // ── Dialog Pai (Corrigido com mounted check) ──────────────────
   void _mostrarDialogPai(BuildContext context) {
     final matriculaCtrl = TextEditingController();
     final nomeCtrl = TextEditingController();
+    bool carregando = false;
+    String? erro;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.family_restroom_rounded,
-                color: Color(0xFF2E7D32)),
-            SizedBox(width: 8),
-            Text('Pai / Responsável'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: matriculaCtrl,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Matrícula do aluno',
-                hintText: 'Ex: 2024001',
-                prefixIcon: const Icon(Icons.badge_outlined),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-            
-            const SizedBox(height: 12),
-            TextField(
-              controller: nomeCtrl,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(
-                labelText: 'Seu nome (responsável)',
-                prefixIcon: const Icon(Icons.person_outline),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+      builder: (_) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              Icon(Icons.family_restroom_rounded, color: Color(0xFF2E7D32)),
+              SizedBox(width: 8),
+              Text('Pai / Responsável'),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              final matricula = matriculaCtrl.text.trim();
-              final nome = nomeCtrl.text.trim();
-
-              if (matricula.isEmpty || nome.isEmpty) return;
-
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => TelaPai(
-                    nomeResponsavel: nome,
-                    nomeAluno: 'Aluno teste',        // fixo por enquanto
-                    placaVeiculo: 'ABC-1234',  // fixo por enquanto
-                  ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: matriculaCtrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Matrícula do aluno',
+                  hintText: 'Ex: 2024001',
+                  prefixIcon: const Icon(Icons.badge_outlined),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2E7D32),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('Entrar'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: nomeCtrl,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: 'Seu nome (responsável)',
+                  prefixIcon: const Icon(Icons.person_outline),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              if (erro != null) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.red[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red[200]!),
+                  ),
+                  child: Row(children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 16),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(erro!, style: const TextStyle(color: Colors.red, fontSize: 12)),
+                    ),
+                  ]),
+                ),
+              ],
+            ],
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: carregando
+                  ? null
+                  : () async {
+                      final matricula = matriculaCtrl.text.trim();
+                      final nome = nomeCtrl.text.trim();
+
+                      if (matricula.isEmpty || nome.isEmpty) {
+                        setDialogState(() => erro = 'Preencha todos os campos.');
+                        return;
+                      }
+
+                      setDialogState(() {
+                        carregando = true;
+                        erro = null;
+                      });
+
+                      // Chamada ao serviço de autenticação
+                      final dados = await AuthService.loginPai(
+                        matricula: matricula,
+                        nomeResponsavel: nome,
+                      );
+
+                      // ✅ IMPORTANTE: Verifica se o widget ainda está na árvore antes de atualizar
+                      if (!ctx.mounted) return;
+
+                      if (dados != null) {
+                        Navigator.pop(ctx); // Fecha o dialog
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TelaPai(
+                              nomeResponsavel: dados['nomeResponsavel'] as String,
+                              nomeAluno: dados['nomeAluno'] as String,
+                              placaVeiculo: dados['placaVeiculo'] as String,
+                            ),
+                          ),
+                        );
+                      } else {
+                        setDialogState(() {
+                          carregando = false;
+                          erro = 'Matrícula ou nome inválidos.';
+                        });
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2E7D32),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: carregando
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Text('Entrar'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -275,8 +314,7 @@ class _PerfilCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.15),
             borderRadius: BorderRadius.circular(20),
@@ -303,8 +341,7 @@ class _PerfilCard extends StatelessWidget {
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     Text(subtitulo,
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13)),
+                        style: const TextStyle(color: Colors.white70, fontSize: 13)),
                   ],
                 ),
               ),

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   
-  static const String baseUrl = 'http://SEU_IP:8080/api/v1/rastreamento';
+  static const String baseUrl = 'http://192.168.0.115:8080/api/v1/rastreamento';
 
   
   static Future<bool> enviarPosicao({
