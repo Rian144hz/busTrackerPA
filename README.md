@@ -27,6 +27,7 @@ O aplicativo conecta a frota municipal aos cidadãos, trazendo segurança e prev
 * **Monitoramento:** Visualização da própria posição e velocidade no mapa.
 
 **Para o Pai / Responsável:**
+* **Autenticação de Responsáveis** Integração completa entre o aplicativo Flutter e o backend Spring Boot para validação de matrícula e nome do responsável.
 * **Acesso Seguro:** Login utilizando a matrícula do aluno e nome do responsável.
 * **Mapa ao Vivo:** Acompanhamento do ônibus em tempo real com rastro do percurso.
 * **Painel de Informações:** Visualização da velocidade atual, status da conexão e última atualização.
