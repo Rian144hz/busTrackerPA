@@ -20,7 +20,7 @@ O aplicativo conecta a frota municipal aos cidadãos, trazendo segurança e prev
 #### ✅ Funcionalidades Atuais (MVP)
 
 **Para o Motorista:**
-* **Identificação:** Login personalizado com nome e placa do veículo.
+* **Identificação:** Login personalizado com nome cpf e placa do veículo.
 * **Telemetria:** Envio automático de localização GPS a cada 10 segundos para o servidor.
 * **Gestão de Percurso:** Botões de controle para embarque/desembarque de alunos.
 * **Comunicação de Incidentes:** Informe de atrasos com lista pré-definida (pneu furado, trânsito, etc) ou motivo personalizado.
