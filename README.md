@@ -64,7 +64,7 @@ O backend em **Java / Spring Boot** recebe as coordenadas do Flutter e as persis
 
 | Tabela de Localização no Banco |
 |:---:|
-| <img src="screenshotsapp/banco_dados.jpeg" width="600"> |
+| <img src="screenshotsapp/Captura de tela de 2026-03-20 11-40-28.png" width="600"> |
 | Registro de Latitude, Longitude, Nome, Placa e CPF do Motorista |
 
 ### 🛠️ Tecnologias Utilizadas
