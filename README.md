@@ -58,6 +58,14 @@ O sistema conta com interfaces distintas e intuitivas para cada tipo de usuário
 | Visualização do ônibus e velocidade | Feedback em tempo real sobre instabilidades |
 
 ---
+### 🗄️ Persistência de Dados (PostgreSQL)
+
+O backend em **Java / Spring Boot** recebe as coordenadas do Flutter e as persiste no banco de dados local. Abaixo, um registro das posições enviadas em tempo real:
+
+| Tabela de Localização no Banco |
+|:---:|
+| <img src="screenshotsapp/banco_dados.jpeg" width="600"> |
+| Registro de Latitude, Longitude, Nome, Placa e CPF do Motorista |
 
 ### 🛠️ Tecnologias Utilizadas
 
