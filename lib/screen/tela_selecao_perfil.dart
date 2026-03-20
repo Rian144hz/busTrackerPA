@@ -86,14 +86,21 @@ class TelaSelecaoPerfil extends StatelessWidget {
   }
 
   // ── Dialog Motorista ──────────────────────────────────────────
-  void _mostrarDialogMotorista(BuildContext context) {
-    final nomeCtrl = TextEditingController();
-    final placaCtrl = TextEditingController();
+  // Substitua o método _mostrarDialogMotorista completo:
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+void _mostrarDialogMotorista(BuildContext context) {
+  final cpfCtrl = TextEditingController();
+  final nomeCtrl = TextEditingController();
+  final placaCtrl = TextEditingController();
+  bool carregando = false;
+  String? erro;
+
+  showDialog(
+    context: context,
+    builder: (_) => StatefulBuilder(
+      builder: (ctx, setDialogState) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
             Icon(Icons.drive_eta, color: Color(0xFF1565C0)),
@@ -104,16 +111,32 @@ class TelaSelecaoPerfil extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // CPF
+            TextField(
+              controller: cpfCtrl,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'CPF',
+                hintText: 'Ex: 123.456.789-00',
+                prefixIcon: const Icon(Icons.badge_outlined),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Nome
             TextField(
               controller: nomeCtrl,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
                 labelText: 'Nome completo',
                 prefixIcon: const Icon(Icons.person_outline),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 12),
+            // Placa
             TextField(
               controller: placaCtrl,
               textCapitalization: TextCapitalization.characters,
@@ -121,44 +144,108 @@ class TelaSelecaoPerfil extends StatelessWidget {
                 labelText: 'Placa do veículo',
                 hintText: 'Ex: ABC-1234',
                 prefixIcon: const Icon(Icons.directions_bus_outlined),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
+
+            // Erro
+            if (erro != null) ...[
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red[200]!),
+                ),
+                child: Row(children: [
+                  const Icon(Icons.error_outline,
+                      color: Colors.red, size: 16),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(erro!,
+                        style: const TextStyle(
+                            color: Colors.red, fontSize: 12)),
+                  ),
+                ]),
+              ),
+            ],
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
-              final nome = nomeCtrl.text.trim();
-              final placa = placaCtrl.text.trim();
-              if (nome.isEmpty || placa.isEmpty) return;
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => TelaMotorista(
-                    nomeMotorista: nome,
-                    placaVeiculo: placa,
-                  ),
-                ),
-              );
-            },
+            onPressed: carregando
+                ? null
+                : () async {
+                    final cpf = cpfCtrl.text.trim();
+                    final nome = nomeCtrl.text.trim();
+                    final placa = placaCtrl.text.trim();
+
+                    if (cpf.isEmpty || nome.isEmpty || placa.isEmpty) {
+                      setDialogState(
+                          () => erro = 'Preencha todos os campos.');
+                      return;
+                    }
+
+                    setDialogState(() {
+                      carregando = true;
+                      erro = null;
+                    });
+
+                    final dados = await AuthService.loginMotorista(
+                      cpf: cpf,
+                      nome: nome,
+                      placaVeiculo: placa,
+                    );
+
+                    if (dados != null) {
+  Navigator.pop(ctx);
+  
+  // 1. Limpa o CPF (tira pontos e traço) antes de converter
+  final cpfLimpo = dados['cpf'].toString().replaceAll(RegExp(r'[^0-9]'), '');
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => TelaMotorista(
+        // 2. Agora o parse funciona porque a String só tem números
+        cpfMotorista: int.parse(cpfLimpo), 
+        nomeMotorista: dados['nome'].toString(),
+        placaVeiculo: dados['placaVeiculo'].toString(),
+                          ),
+                        ),
+                      );
+                    } else {
+                      setDialogState(() {
+                        carregando = false;
+                        erro = 'CPF, nome ou placa inválidos.';
+                      });
+                    }
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1565C0),
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('Entrar'),
+            child: carregando
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2))
+                : const Text('Entrar'),
           ),
         ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   // ── Dialog Pai (Corrigido com mounted check) ──────────────────
   void _mostrarDialogPai(BuildContext context) {
     final matriculaCtrl = TextEditingController();

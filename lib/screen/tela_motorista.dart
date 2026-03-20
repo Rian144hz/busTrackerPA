@@ -17,11 +17,13 @@ const List<Map<String, dynamic>> _atrasosPreDefinidos = [
 ];
 
 class TelaMotorista extends StatefulWidget {
+final int cpfMotorista;
   final String nomeMotorista;
   final String placaVeiculo;
 
   const TelaMotorista({
     super.key,
+    required this.cpfMotorista,
     required this.nomeMotorista,
     required this.placaVeiculo,
   });
@@ -82,6 +84,8 @@ class _TelaMotoristaState extends State<TelaMotorista> {
 
   Future<void> _onNovaPosicao(Position posicao) async {
     final sucesso = await ApiService.enviarPosicao(
+    cpf: widget.cpfMotorista,
+    nome: widget.nomeMotorista,
       placaVeiculo: widget.placaVeiculo,
       latitude: posicao.latitude,
       longitude: posicao.longitude,

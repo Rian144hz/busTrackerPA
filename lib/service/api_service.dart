@@ -5,10 +5,12 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   
-  static const String baseUrl = 'http://192.168.0.115:8080/api/v1/rastreamento';
+  static const String baseUrl = 'https://uncast-apparently-kyson.ngrok-free.dev/api/v1/rastreamento';
 
   
   static Future<bool> enviarPosicao({
+  required int cpf,
+  required String nome,
   required String placaVeiculo,
   required double latitude,
   required double longitude,
@@ -18,6 +20,8 @@ class ApiService {
   final uri = Uri.parse('$baseUrl/enviar');
 
   final Map<String, dynamic> bodyMap = {
+     'cpf':cpf,
+     'nome':nome,
     'placaVeiculo': placaVeiculo,
     'latitude': latitude,
     'longitude': longitude,

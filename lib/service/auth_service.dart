@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const _baseUrl = 'http://192.168.0.115:8080/api/v1/auth';
+  static const _baseUrl = 'https://uncast-apparently-kyson.ngrok-free.dev/api/v1/auth';
 
   /// Login do pai — valida matrícula + nome do responsável no banco.
   /// Retorna os dados do aluno ou null se inválido.
@@ -29,4 +29,32 @@ class AuthService {
       return null;
     }
   }
+  
+
+/// Login do motorista — valida CPF + nome + placa no banco.
+static Future<Map<String, dynamic>?> loginMotorista({
+  required String cpf,
+  required String nome,
+  required String placaVeiculo,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$_baseUrl/motorista'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'cpf': cpf,
+        'nome': nome,
+        'placaVeiculo': placaVeiculo,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+    return null;
+  } catch (e) {
+    print('[AuthService] ❌ Erro motorista: $e');
+    return null;
+  }
+}
 }
