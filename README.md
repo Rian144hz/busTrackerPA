@@ -74,7 +74,7 @@ Para garantir a segurança, o sistema faz o controle de acesso dos pais e respon
 
 | Registro de Responsáveis (Banco de Dados) |
 |:---:|
-| <img src="screenshotsapp/banco_pais.jpeg" width="800"> |
+| <img src="screenshotsapp/Captura de tela de 2026-03-20 12-54-40.png" width="800"> |
 | **Atributos principais:** Nome do Responsável, Matrícula, Status (Ativo/Inativo), Data de Criação e Nome do Aluno vinculado. |
 
 > **Nota:** O campo `status_ativo` permite que a administração do transporte bloqueie o acesso de alunos que trancaram o semestre ou não renovaram o auxílio transporte, garantindo que apenas usuários autorizados vejam a localização em tempo real.
