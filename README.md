@@ -79,6 +79,31 @@ Para garantir a segurança, o sistema faz o controle de acesso dos pais e respon
 
 > **Nota:** O campo `status_ativo` permite que a administração do transporte bloqueie o acesso de alunos que trancaram o semestre ou não renovaram o auxílio transporte, garantindo que apenas usuários autorizados vejam a localização em tempo real.
 
+---
+## 📱 Demonstração em Tempo Real
+
+Abaixo, você pode ver o sistema em funcionamento com dois dispositivos reais.
+
+<p align="center">
+  <img src="path/to/sua/foto.heic" alt="Demonstração do BusTrackerPA" width="600px">
+</p>
+
+### O que esta imagem demonstra:
+
+1.  **Celular da Esquerda (Motorista):**
+    * **App Ativo:** O status está "Ativo" (bolinha verde).
+    * **Envios com Sucesso:** 15 pacotes de localização foram enviados ao backend (Spring Boot via ngrok).
+    * **Mapa:** Mostra a localização atual do motorista em Paulo Afonso.
+    * **Ações:** Botões para "Informar Atraso" e "Parar Rastreamento".
+
+2.  **Celular da Direita (Pai/Aluno):**
+    * **Status do Ônibus:** Exibe "Ao vivo", indicando que está recebendo atualizações recentes.
+    * **Placa do Veículo:** Identifica o ônibus sendo rastreado (ABC-1234).
+    * **Mapa:** Mostra o ícone do ônibus se movendo em tempo real, consumindo os dados enviados pelo motorista.
+    * **Última Atualização:** Mostra o horário exato da última posição recebida.
+
+> **Nota:** Esta demonstração valida a integração completa entre os aplicativos móveis (Flutter), o servidor backend (Spring Boot), o banco de dados (PostgreSQL) e o tunelamento de rede (ngrok), garantindo a comunicação mesmo em redes diferentes.
+
 ### 🛠️ Tecnologias Utilizadas
 
 #### **Backend (Java Spring Boot)**
