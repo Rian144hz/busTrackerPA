@@ -67,6 +67,18 @@ O backend em **Java / Spring Boot** recebe as coordenadas do Flutter e as persis
 | <img src="screenshotsapp/Captura de tela de 2026-03-20 11-40-28.png" width="600"> |
 | Registro de Latitude, Longitude, Nome, Placa e CPF do Motorista |
 
+---
+### 👨‍👩‍👧‍👦 Gerenciamento de Responsáveis e Alunos
+
+Para garantir a segurança, o sistema faz o controle de acesso dos pais e responsáveis, vinculando-os diretamente à matrícula e ao status de atividade do aluno.
+
+| Registro de Responsáveis (Banco de Dados) |
+|:---:|
+| <img src="screenshotsapp/banco_pais.jpeg" width="800"> |
+| **Atributos principais:** Nome do Responsável, Matrícula, Status (Ativo/Inativo), Data de Criação e Nome do Aluno vinculado. |
+
+> **Nota:** O campo `status_ativo` permite que a administração do transporte bloqueie o acesso de alunos que trancaram o semestre ou não renovaram o auxílio transporte, garantindo que apenas usuários autorizados vejam a localização em tempo real.
+
 ### 🛠️ Tecnologias Utilizadas
 
 #### **Backend (Java Spring Boot)**
