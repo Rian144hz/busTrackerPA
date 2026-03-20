@@ -42,7 +42,7 @@ O sistema conta com interfaces distintas e intuitivas para cada tipo de usuário
 ### 🏠 Fluxo de Acesso
 | Seleção de Perfil | Cadastro Motorista | Cadastro Pai / Responsável |
 |:---:|:---:|:---:|
-| <img src="screenshotsapp/tela_inicial_app.jpeg" width="250"> | <img src="screenshotsapp/cadastro_motorista.jpeg" width="250"> | <img src="screenshotsapp/cadastro_pai.jpeg" width="250"> |
+| <img src="screenshotsapp/tela_inicial_app.jpeg" width="250"> | <img src="screenshotsapp/motorista_cpf.jpeg" width="250"> | <img src="screenshotsapp/cadastro_pai.jpeg" width="250"> |
 | Escolha entre os perfis | Identificação por Nome e Placa | Acesso via Matrícula e Nome |
 
 ### 🚛 Interface do Motorista (Em Rota)
