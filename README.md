@@ -93,7 +93,7 @@ Abaixo, você pode ver o sistema em funcionamento com dois dispositivos reais.
 1.  **Celular da Esquerda (Motorista):**
     * **App Ativo:** O status está "Ativo" (bolinha verde).
     * **Envios com Sucesso:** 15 pacotes de localização foram enviados ao backend (Spring Boot via ngrok).
-    * **Mapa:** Mostra a localização atual do motorista em Paulo Afonso.
+    * **Mapa:** Mostra a localização atual do motorista torquato (povoado onde moro).
     * **Ações:** Botões para "Informar Atraso" e "Parar Rastreamento".
 
 2.  **Celular da Direita (Pai/Aluno):**
