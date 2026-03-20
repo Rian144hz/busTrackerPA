@@ -85,7 +85,7 @@ Para garantir a segurança, o sistema faz o controle de acesso dos pais e respon
 Abaixo, você pode ver o sistema em funcionamento com dois dispositivos reais.
 
 <p align="center">
-  <img src="path/to/sua/foto.heic" alt="Demonstração do BusTrackerPA" width="600px">
+  <img src="screenshotsapp/app_funcionando.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
 </p>
 
 ### O que esta imagem demonstra:
