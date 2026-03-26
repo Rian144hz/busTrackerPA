@@ -104,6 +104,31 @@ Abaixo, você pode ver o sistema em funcionamento com dois dispositivos reais.
 
 > **Nota:** Esta demonstração valida a integração completa entre os aplicativos móveis (Flutter), o servidor backend (Spring Boot), o banco de dados (PostgreSQL) e o tunelamento de rede (ngrok), garantindo a comunicação mesmo em redes diferentes.
 
+## 📍 Teste de Campo: Validação Real-Time (Quixaba x Torquato)
+
+O sistema foi validado em um cenário real de longa distância, provando a eficiência da comunicação entre o **Distrito Quixaba** e o **povoado Torquato** em Gloria- BA.
+
+### 📊 Detalhes do Teste
+* **Origem (Motorista):** Povoado de Quixaba (Zona Rural).
+* **Destino (Responsável):** Povoado Torquato (Zona Rural).
+* **Conectividade:** Dados móveis (4G/LTE) -> Túnel HTTP (Ngrok) -> Servidor Java (Spring Boot).
+* **Latência:** Atualização de posição em tempo real com delay inferior a 2 segundos.
+
+### 📸 Evidências do Funcionamento
+| Tela do Motorista (Quixaba) | Tela do Responsável (T4) | Logs do Servidor (Ngrok/Java) |
+| :---: | :---: | :---: |
+| ![Motorista](tela_quixaba.jpeg) | ![Responsável](tela_torquato.jpeg) | ![Ngrok Logs](tela_ngrokemoji.jpeg) |
+
+---
+
+## 📈 Roadmap de Evolução (Próximos Passos)
+
+Após a validação da conectividade básica, o projeto seguirá para as seguintes implementações:
+
+1. **Alertas de Atraso (In-App):** Notificações visuais imediatas para os pais quando o motorista reportar imprevistos (ex: pneu furado, trânsito).
+2. **Refinamento de ETA:** Algoritmo para previsão de chegada baseado na distância real e velocidade média.
+3. **Pontos de Geofencing:** Marcação automática de pontos de embarque e partida para maior controle logístico.
+
 ### 🛠️ Tecnologias Utilizadas
 
 #### **Backend (Java Spring Boot)**
