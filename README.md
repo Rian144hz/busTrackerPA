@@ -115,9 +115,15 @@ O sistema foi validado em um cenário real de longa distância, provando a efici
 * **Latência:** Atualização de posição em tempo real com delay inferior a 2 segundos.
 
 ### 📸 Evidências do Funcionamento
-| Tela do Motorista (Quixaba) | Tela do Responsável (T4) | Logs do Servidor (Ngrok/Java) |
-| :---: | :---: | :---: |
-| ![Motorista](tela_quixaba.jpeg) | ![Responsável](tela_torquato.jpeg) | ![Ngrok Logs](tela_ngrokemoji.jpeg) |
+Abaixo, você pode ver o sistema em funcionamento com os dispositivos reais e o monitoramento do servidor.
+<p align="center">
+  <img src="screenshotsapp/tela_quixaba.jpeg" alt="Motorista na Quixaba" width="250px">
+  <img src="screenshotsapp/tela_torquato.jpeg" alt="Responsável no Torquato" width="250px">
+</p>
+
+<p align="center">
+  <img src="screenshotsapp/tela_ngrokemoji.jpeg" alt="Logs do Servidor Ngrok" width="500px">
+</p>
 
 ---
 
