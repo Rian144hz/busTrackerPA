@@ -104,36 +104,51 @@ Abaixo, você pode ver o sistema em funcionamento com dois dispositivos reais.
 
 > **Nota:** Esta demonstração valida a integração completa entre os aplicativos móveis (Flutter), o servidor backend (Spring Boot), o banco de dados (PostgreSQL) e o tunelamento de rede (ngrok), garantindo a comunicação mesmo em redes diferentes.
 
-## 📍 Teste de Campo: Validação Real-Time (Quixaba x Torquato)
+## 🚀 Teste de Campo: Validação Real-Time
 
-O sistema foi validado em um cenário real de longa distância, provando a eficiência da comunicação entre o **Distrito Quixaba** e o **povoado Torquato** em Gloria- BA.
+O sistema foi colocado à prova em um cenário real de longa distância, conectando o **Distrito de Quixaba** ao **povoado Torquato (Glória - BA)**. O teste validou a estabilidade da arquitetura em redes móveis instáveis.
 
-### 📊 Detalhes do Teste
-* **Origem (Motorista):** Povoado de Quixaba (Zona Rural).
-* **Destino (Responsável):** Povoado Torquato (Zona Rural).
-* **Conectividade:** Dados móveis (4G/LTE) -> Túnel HTTP (Ngrok) -> Servidor Java (Spring Boot).
-* **Latência:** Atualização de posição em tempo real com delay inferior a 2 segundos.
+<div align="center">
+  <img src="https://img.shields.io/badge/Status-Sucesso_Total-success?style=for-the-badge&logo=checkmarx" />
+  <img src="https://img.shields.io/badge/Latência-< 2s-blue?style=for-the-badge&logo=speedtest" />
+  <img src="https://img.shields.io/badge/Conexão-4G/LTE-orange?style=for-the-badge" />
+</div>
 
-### 📸 Evidências do Funcionamento
-Abaixo, você pode ver o sistema em funcionamento com os dispositivos reais e o monitoramento do servidor.
+### 📱 Demonstração em Tempo Real
+
 <p align="center">
-  <img src="screenshotsapp/tela_quixaba.jpeg" alt="Motorista na Quixaba" width="250px">
-  <img src="screenshotsapp/tela_torquato.jpeg" alt="Responsável no Torquato" width="250px">
+  <kbd>
+    <img src="screenshotsapp/tela_quixaba.jpeg" alt="Motorista na Quixaba" width="240px">
+  </kbd>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <kbd>
+    <img src="screenshotsapp/tela_torquato.jpeg" alt="Responsável no Torquato" width="240px">
+  </kbd>
 </p>
 
 <p align="center">
-  <img src="screenshotsapp/tela_ngrokemoji.jpeg" alt="Logs do Servidor Ngrok" width="500px">
+  <b>Monitoramento do Servidor (Túnel Ngrok)</b><br>
+  <img src="screenshotsapp/tela_ngrokemoji.jpeg" alt="Logs do Servidor" width="550px" style="border-radius: 10px; border: 1px solid #ddd;">
 </p>
 
 ---
 
-## 📈 Roadmap de Evolução (Próximos Passos)
+### 🔍 Detalhes Técnicos do Fluxo
+> **Caminho do Dado:** > `📍 Quixaba (App Motorista)` ➔ `🛰️ Rede 4G` ➔ `🌩️ Ngrok (Proxy)` ➔ `☕ Spring Boot (Local)` ➔ `📍 Torquato (App Pai)`
 
-Após a validação da conectividade básica, o projeto seguirá para as seguintes implementações:
+* **Backhaul:** Túnel HTTP via Ngrok expondo o servidor local.
+* **Geolocalização:** GPS de alta precisão com filtragem de ruído.
+* **Segurança:** Handshake validado via Spring Security.
 
-1. **Alertas de Atraso (In-App):** Notificações visuais imediatas para os pais quando o motorista reportar imprevistos (ex: pneu furado, trânsito).
-2. **Refinamento de ETA:** Algoritmo para previsão de chegada baseado na distância real e velocidade média.
-3. **Pontos de Geofencing:** Marcação automática de pontos de embarque e partida para maior controle logístico.
+---
+
+## 📈 Roadmap de Evolução
+
+O BusTracker PA não para por aqui. Confira o que está sendo desenvolvido:
+
+- [ ] **🔔 Alertas de Atraso:** Notificações Push instantâneas (Pneu furado, trânsito, etc).
+- [ ] **⏱️ Refinamento de ETA:** Algoritmo preditivo de tempo de chegada.
+- [ ] **🚧 Geofencing:** Cercas virtuais para avisos automáticos de proximidade.
 
 ### 🛠️ Tecnologias Utilizadas
 
