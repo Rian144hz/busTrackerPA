@@ -50,7 +50,13 @@ O maior marco do projeto foi o teste real de longa distância conectando o **Dis
 
 <p align="center">
   <kbd>
-    <img src="screenshotsapp/app_funcionando.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
+    <img src="screenshotsapp/tela_quixaba.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
+  </kbd>
+</p>
+
+<p align="center">
+  <kbd>
+    <img src="screenshotsapp/tela_torquato.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
   </kbd>
 </p>
 
