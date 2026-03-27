@@ -17,7 +17,7 @@ O **BusTracker PA** é uma solução Full Stack autoral desenvolvida para monito
 Este projeto nasceu da vontade de aplicar os conhecimentos do **IFBA** para resolver um problema real da região de **Paulo Afonso-BA**.
 
 * **Arquitetura Autoral:** Toda a modelagem do banco de dados, lógica de backend em Java e integração mobile foi idealizada por mim.
-* **Pair Programming com IA:** No processo de codificação, utilizei o **Claude (Anthropic)** como parceiro estratégico. Essa colaboração permitiu acelerar o desenvolvimento das interfaces em Flutter e o debug do ambiente no **Linux Ubuntu**, focando a energia na regra de negócio e segurança.
+* **Pair Programming com IA:** No processo de codificação, utilizei a IA como parceiro estratégico. Essa colaboração permitiu acelerar o desenvolvimento das interfaces em Flutter e o debug do ambiente no **Linux Ubuntu**, focando a energia na regra de negócio e segurança.
 * **Propósito:** Aplicar Lógica de Programação e Engenharia de Software para trazer segurança aos alunos e tranquilidade aos pais do sertão baiano.
 
 ---
@@ -48,19 +48,25 @@ Este projeto nasceu da vontade de aplicar os conhecimentos do **IFBA** para reso
 
 O maior marco do projeto foi o teste real de longa distância conectando o **Distrito de Quixaba** ao **Povoado Torquato (Glória-BA)**.
 
+### 📱 Dispositivos em Tempo Real
 <p align="center">
   <kbd>
-    <img src="screenshotsapp/tela_quixaba.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
+    <img src="screenshotsapp/tela_quixaba.jpeg" alt="Motorista na Quixaba" width="260px">
+  </kbd>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <kbd>
+    <img src="screenshotsapp/tela_torquato.jpeg" alt="Responsável no Torquato" width="260px">
   </kbd>
 </p>
 
+### 🖥️ Monitoramento do Servidor (Logs do Ngrok)
+Abaixo, a evidência técnica do túnel HTTP recebendo as requisições `POST` vindas da Quixaba via rede móvel:
+
 <p align="center">
-  <kbd>
-    <img src="screenshotsapp/tela_torquato.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
-  </kbd>
+  <img src="screenshotsapp/tela_ngrokemoji.jpeg" alt="Logs do Servidor Ngrok" width="600px" style="border-radius: 10px; border: 1px solid #ddd;">
 </p>
 
-> **Prova de Conceito:** A imagem acima mostra o motorista (esquerda) na Quixaba enviando dados via 4G, e o pai (direita) no Torquato recebendo a posição em tempo real. Integração via **Ngrok** com latência inferior a 2 segundos.
+> **Prova de Conceito:** A integração via **Ngrok** permitiu que o motorista (esquerda) enviasse dados de uma rede externa, e o pai (direita) recebesse a posição em tempo real com latência inferior a 2 segundos.
 
 ---
 
@@ -100,9 +106,9 @@ O backend gerencia o fluxo de coordenadas e a segurança de acesso dos responsá
 ## 📂 Estrutura do Projeto
 
 ```bash
-├── 📦 escolar-api           # Backend Spring Boot (Java)
-│   ├── src/main/java        # Controllers, Models e Services
-│   └── resources/           # Configurações PostgreSQL e Application Props
-└── 📦 rastreamento_escolar   # App Mobile (Flutter)
-    ├── lib/screen           # Interfaces de cada perfil
-    └── lib/service          # Lógica de API e GPS
+├── 📦 escolar-api            # Backend Spring Boot (Java)
+│   ├── src/main/java         # Controllers, Models e Services
+│   └── resources/            # Configurações PostgreSQL e Application Props
+└── 📦 rastreamento_escolar    # App Mobile (Flutter)
+    ├── lib/screen            # Interfaces de cada perfil
+    └── lib/service           # Lógica de API e GPS
