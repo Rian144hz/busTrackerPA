@@ -1,138 +1,114 @@
-# 🚌 BusTracker - Sistema de Rastreamento Escolar (Paulo Afonso-BA)
+# 🚌 BusTracker PA — Sistema de Rastreamento Escolar (Paulo Afonso-BA)
 
-O **BusTracker** é uma solução Full Stack real, idealizada e desenvolvida para monitorar o transporte escolar no Sertão da Bahia. O sistema permite que motoristas enviem sua localização em tempo real e que pais/responsáveis acompanhem o trajeto, velocidade e estimativa de chegada diretamente pelo celular.
+<p align="center">
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
+  <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Linux_Ubuntu-E9430F?style=for-the-badge&logo=ubuntu&logoColor=white" />
+  <img src="https://img.shields.io/badge/Status-MVP_Validado-success?style=for-the-badge" />
+</p>
+
+O **BusTracker PA** é uma solução Full Stack autoral desenvolvida para monitorar o transporte escolar no Sertão da Bahia. O sistema permite que motoristas enviem sua localização em tempo real e que pais/responsáveis acompanhem o trajeto, velocidade e alertas de atraso diretamente pelo smartphone.
+
+---
 
 ## 🚀 Sobre o Desenvolvimento (Realidade do Projeto)
 
-Este projeto é fruto de uma iniciativa **totalmente autoral**, unindo a necessidade real da região de **Paulo Afonso-BA** com as tecnologias que venho dominando no **IFBA**. 
+Este projeto nasceu da vontade de aplicar os conhecimentos do **IFBA** para resolver um problema real da região de **Paulo Afonso-BA**.
 
-A construção do **BusTracker PA** seguiu uma dinâmica de mercado moderna:
-
-* **Arquitetura e Ideação:** Toda a estrutura do sistema, desde a modelagem do banco de dados em Java (Spring Boot) até a lógica de rastreamento, foi idealizada por mim.
-* **Pair Programming com IA:** No processo de codificação, utilizei o **Claude (Anthropic)** como meu parceiro de programação. Ele foi essencial para agilizar a criação das interfaces no Flutter e auxiliar no debugging de ambiente no **Linux Ubuntu**, permitindo que eu focasse 100% na lógica de negócio e na integração do ecossistema.
-* **Propósito:** Estou muito animado com o potencial desse projeto! Aplicar o que aprendi em Lógica de Programação e Java para resolver um problema do meu cotidiano é o que me motiva a evoluir como desenvolvedor.
+* **Arquitetura Autoral:** Toda a modelagem do banco de dados, lógica de backend em Java e integração mobile foi idealizada por mim.
+* **Pair Programming com IA:** No processo de codificação, utilizei a IA como parceiro estratégico. Essa colaboração permitiu acelerar o desenvolvimento das interfaces em Flutter e o debug do ambiente no **Linux Ubuntu**, focando a energia na regra de negócio e segurança.
+* **Propósito:** Aplicar Lógica de Programação e Engenharia de Software para trazer segurança aos alunos e tranquilidade aos pais do sertão baiano.
 
 ---
 
-### 📱 Sobre o Projeto
-O aplicativo conecta a frota municipal aos cidadãos, trazendo segurança e previsibilidade para o transporte de alunos em Paulo Afonso — BA. O diferencial do projeto é a segmentação de perfis, garantindo que a informação certa chegue à pessoa certa.
+## 📸 Demonstração das Interfaces
 
-#### ✅ Funcionalidades Atuais (MVP)
-
-**Para o Motorista:**
-* **Identificação:** Login personalizado com nome cpf e placa do veículo.
-* **Telemetria:** Envio automático de localização GPS a cada 10 segundos para o servidor.
-* **Gestão de Percurso:** Botões de controle para embarque/desembarque de alunos.
-* **Comunicação de Incidentes:** Informe de atrasos com lista pré-definida (pneu furado, trânsito, etc) ou motivo personalizado.
-* **Monitoramento:** Visualização da própria posição e velocidade no mapa.
-
-**Para o Pai / Responsável:**
-* **Autenticação de Responsáveis** Integração completa entre o aplicativo Flutter e o backend Spring Boot para validação de matrícula e nome do responsável.
-* **Acesso Seguro:** Login utilizando a matrícula do aluno e nome do responsável.
-* **Mapa ao Vivo:** Acompanhamento do ônibus em tempo real com rastro do percurso.
-* **Painel de Informações:** Visualização da velocidade atual, status da conexão e última atualização.
-* **Alertas:** Banner de notificação imediata caso o motorista informe algum atraso ou imprevisto.
-
----
-
-## 📸 Demonstração do Aplicativo
-
-O sistema conta com interfaces distintas e intuitivas para cada tipo de usuário.
-
-### 🏠 Fluxo de Acesso
-| Seleção de Perfil | Cadastro Motorista | Cadastro Pai / Responsável |
+### 🏠 Fluxo de Acesso e Perfis
+| Seleção de Perfil | Cadastro Motorista | Cadastro Responsável |
 |:---:|:---:|:---:|
-| <img src="screenshotsapp/tela_inicial_app.jpeg" width="250"> | <img src="screenshotsapp/motorista_cpf.jpeg" width="250"> | <img src="screenshotsapp/cadastro_pai.jpeg" width="250"> |
-| Escolha entre os perfis | Identificação por Nome e Placa | Acesso via Matrícula e Nome |
+| <img src="screenshotsapp/tela_inicial_app.jpeg" width="230"> | <img src="screenshotsapp/motorista_cpf.jpeg" width="230"> | <img src="screenshotsapp/cadastro_pai.jpeg" width="230"> |
+| *Escolha de papel* | *Identificação e Placa* | *Vínculo via Matrícula* |
 
-### 🚛 Interface do Motorista (Em Rota)
-| Aguardando Início | Localização Enviada | Alerta de Atraso | Opções de Atraso |
+### 🚛 Painel do Motorista (Em Rota)
+| Aguardando Início | Localização Enviada | Alerta de Atraso Ativo | Motivos Disponíveis |
 |:---:|:---:|:---:|:---:|
-| <img src="screenshotsapp/tela_motorista.jpeg" width="200"> | <img src="screenshotsapp/tela_enviando_localizacao.jpeg" width="200"> | <img src="screenshotsapp/tela_atraso.jpeg" width="200"> | <img src="screenshotsapp/opcoes_atrasos.jpeg" width="200"> |
-| Mapa de Paulo Afonso | Confirmação de envio ao Java | Status de atraso ativo | Motivos pré-definidos |
+| <img src="screenshotsapp/tela_motorista.jpeg" width="180"> | <img src="screenshotsapp/tela_enviando_localizacao.jpeg" width="180"> | <img src="screenshotsapp/tela_atraso.jpeg" width="180"> | <img src="screenshotsapp/opcoes_atrasos.jpeg" width="180"> |
+| *Mapa Base* | *Feedback de Envio* | *Banner de Alerta* | *Lista Pré-definida* |
 
-### 👨‍👩‍👦 Interface dos Pais (Acompanhamento)
-| Monitoramento ao Vivo | Falha de Conexão (Tratamento de Erro) |
+### 👨‍👩‍👦 Painel dos Pais (Monitoramento)
+| Acompanhamento ao Vivo | Tratamento de Erro |
 |:---:|:---:|
 | <img src="screenshotsapp/tela_pai.jpeg" width="250"> | <img src="screenshotsapp/tela_localizacao_falhou.jpeg" width="250"> |
-| Visualização do ônibus e velocidade | Feedback em tempo real sobre instabilidades |
+| *Ônibus em Movimento* | *Feedback de Conexão* |
 
 ---
-### 🗄️ Persistência de Dados (PostgreSQL)
 
-O backend em **Java / Spring Boot** recebe as coordenadas do Flutter e as persiste no banco de dados local. Abaixo, um registro das posições enviadas em tempo real:
+## 🧪 Validação em Campo: "O Teste da Quixaba"
 
-| Tabela de Localização no Banco |
-|:---:|
-| <img src="screenshotsapp/Captura de tela de 2026-03-20 11-40-28.png" width="600"> |
-| Registro de Latitude, Longitude, Nome, Placa e CPF do Motorista |
+O maior marco do projeto foi o teste real de longa distância conectando o **Distrito de Quixaba** ao **Povoado Torquato (Glória-BA)**.
 
----
-### 👨‍👩‍👧‍👦 Gerenciamento de Responsáveis e Alunos
-
-Para garantir a segurança, o sistema faz o controle de acesso dos pais e responsáveis, vinculando-os diretamente à matrícula e ao status de atividade do aluno.
-
-| Registro de Responsáveis (Banco de Dados) |
-|:---:|
-| <img src="screenshotsapp/Captura de tela de 2026-03-20 12-54-40.png" width="800"> |
-| **Atributos principais:** Nome do Responsável, Matrícula, Status (Ativo/Inativo), Data de Criação e Nome do Aluno vinculado. |
-
-> **Nota:** O campo `status_ativo` permite que a administração do transporte bloqueie o acesso de alunos que trancaram o semestre ou não renovaram o auxílio transporte, garantindo que apenas usuários autorizados vejam a localização em tempo real.
-
----
-## 📱 Demonstração em Tempo Real
-
-Abaixo, você pode ver o sistema em funcionamento com dois dispositivos reais.
-
+### 📱 Dispositivos em Tempo Real
 <p align="center">
-  <img src="screenshotsapp/app_funcionando.jpeg" alt="Demonstração do BusTrackerPA" width="600px">
+  <kbd>
+    <img src="screenshotsapp/tela_quixaba.jpeg" alt="Motorista na Quixaba" width="260px">
+  </kbd>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <kbd>
+    <img src="screenshotsapp/tela_torquato.jpeg" alt="Responsável no Torquato" width="260px">
+  </kbd>
 </p>
 
-### O que esta imagem demonstra:
+### 🖥️ Monitoramento do Servidor (Logs do Ngrok)
+Abaixo, a evidência técnica do túnel HTTP recebendo as requisições `POST` vindas da Quixaba via rede móvel:
 
-1.  **Celular da Esquerda (Motorista):**
-    * **App Ativo:** O status está "Ativo" (bolinha verde).
-    * **Envios com Sucesso:** 15 pacotes de localização foram enviados ao backend (Spring Boot via ngrok).
-    * **Mapa:** Mostra a localização atual do motorista torquato (povoado onde moro).
-    * **Ações:** Botões para "Informar Atraso" e "Parar Rastreamento".
+<p align="center">
+  <img src="screenshotsapp/tela_ngrokemoji.jpeg" alt="Logs do Servidor Ngrok" width="600px" style="border-radius: 10px; border: 1px solid #ddd;">
+</p>
 
-2.  **Celular da Direita (Pai/Aluno):**
-    * **Status do Ônibus:** Exibe "Ao vivo", indicando que está recebendo atualizações recentes.
-    * **Placa do Veículo:** Identifica o ônibus sendo rastreado (ABC-1234).
-    * **Mapa:** Mostra o ícone do ônibus se movendo em tempo real, consumindo os dados enviados pelo motorista.
-    * **Última Atualização:** Mostra o horário exato da última posição recebida.
-
-> **Nota:** Esta demonstração valida a integração completa entre os aplicativos móveis (Flutter), o servidor backend (Spring Boot), o banco de dados (PostgreSQL) e o tunelamento de rede (ngrok), garantindo a comunicação mesmo em redes diferentes.
-
-### 🛠️ Tecnologias Utilizadas
-
-#### **Backend (Java Spring Boot)**
-* **Linguagem:** Java 21
-* **Framework:** Spring Boot 3.5.12 (Spring Data JPA)
-* **Banco de Dados:** PostgreSQL (Gerenciado via DBeaver)
-* **Produtividade:** Lombok para redução de código boilerplate.
-* **Infraestrutura:** Servidor rodando em **Linux Ubuntu** com túnel reverso via **Ngrok** para testes externos em rede móvel (4G).
-
-#### **Mobile (Flutter)**
-* **Localização:** `geolocator` para captura de coordenadas GPS reais.
-* **Mapas:** `flutter_map` (OpenStreetMap) e `latlong2`.
-* **Comunicação:** Pacote `http` para integração com API REST (JSON).
-* **Internacionalização:** `intl` para formatação de datas e horas locais.
+> **Prova de Conceito:** A integração via **Ngrok** permitiu que o motorista (esquerda) enviasse dados de uma rede externa, e o pai (direita) recebesse a posição em tempo real com latência inferior a 2 segundos.
 
 ---
 
-### 🗂️ Estrutura do Projeto
+## 🗄️ Backend & Persistência (Java + PostgreSQL)
 
-```text
-📦 rastreamento_escolar/          # App Flutter
-└── lib/
-    ├── main.dart
-    ├── screen/ (tela_selecao_perfil.dart, tela_motorista.dart, tela_pai.dart)
-    └── service/ (api_service.dart, location_service.dart)
+O backend gerencia o fluxo de coordenadas e a segurança de acesso dos responsáveis.
 
-📦 escolar-api/                   # Backend Java
-└── src/main/java/.../
-    ├── controller/ (RastreamentoController.java, AuthController.java)
-    ├── service/ (RastreamentoService.java)
-    ├── model/ (PosicaoVeiculo.java)
-    └── config/ (CorsConfig.java)
+| Registro de Localização (Posições) | Gestão de Responsáveis (Status Ativo) |
+|:---:|:---:|
+| <img src="screenshotsapp/Captura de tela de 2026-03-20 11-40-28.png" width="400"> | <img src="screenshotsapp/Captura de tela de 2026-03-20 12-54-40.png" width="400"> |
+| *Logs de Telemetria* | *Controle de Acesso de Alunos* |
+
+---
+
+## 🛠️ Stack Tecnológica
+
+### **Mobile (Flutter)**
+* **GPS:** `geolocator` para captura de coordenadas reais.
+* **Mapas:** `flutter_map` (OpenStreetMap) + `latlong2`.
+* **Networking:** Integração com API REST via pacotes assíncronos.
+
+### **Backend (Spring Boot)**
+* **Linguagem:** Java 21 / Spring Boot 3.x.
+* **Database:** PostgreSQL (Gerenciado via DBeaver).
+* **Infra:** Linux Ubuntu + Ngrok (Túnel reverso para WAN).
+
+---
+
+## 📈 Roadmap de Evolução
+
+- [ ] **🔔 Notificações Push:** Alertas fora do aplicativo via Firebase.
+- [ ] **⏱️ Algoritmo ETA:** Cálculo de previsão de chegada baseado em velocidade média.
+- [ ] **🚧 Geofencing:** Cercas virtuais para avisos de proximidade da residência.
+
+---
+
+## 📂 Estrutura do Projeto
+
+```bash
+├── 📦 escolar-api            # Backend Spring Boot (Java)
+│   ├── src/main/java         # Controllers, Models e Services
+│   └── resources/            # Configurações PostgreSQL e Application Props
+└── 📦 rastreamento_escolar    # App Mobile (Flutter)
+    ├── lib/screen            # Interfaces de cada perfil
+    └── lib/service           # Lógica de API e GPS
