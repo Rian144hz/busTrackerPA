@@ -85,8 +85,7 @@ class TelaSelecaoPerfil extends StatelessWidget {
     );
   }
 
-  // ── Dialog Motorista ──────────────────────────────────────────
-  // Substitua o método _mostrarDialogMotorista completo:
+  
 
 void _mostrarDialogMotorista(BuildContext context) {
   final cpfCtrl = TextEditingController();

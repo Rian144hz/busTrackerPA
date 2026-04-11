@@ -8,16 +8,16 @@ import '../service/api_service.dart';
 import '../service/location_service.dart';
 
 const List<Map<String, dynamic>> _atrasosPreDefinidos = [
-  {'icone': Icons.tire_repair,       'motivo': 'Pneu furado'},
-  {'icone': Icons.traffic,           'motivo': 'Trânsito intenso'},
-  {'icone': Icons.build,             'motivo': 'Problema mecânico'},
-  {'icone': Icons.car_crash,         'motivo': 'Acidente na via'},
+  {'icone': Icons.tire_repair, 'motivo': 'Pneu furado'},
+  {'icone': Icons.traffic, 'motivo': 'Trânsito intenso'},
+  {'icone': Icons.build, 'motivo': 'Problema mecânico'},
+  {'icone': Icons.car_crash, 'motivo': 'Acidente na via'},
   {'icone': Icons.local_gas_station, 'motivo': 'Abastecimento'},
-  {'icone': Icons.child_care,        'motivo': 'Aguardando aluno'},
+  {'icone': Icons.child_care, 'motivo': 'Aguardando aluno'},
 ];
 
 class TelaMotorista extends StatefulWidget {
-final int cpfMotorista;
+  final int cpfMotorista;
   final String nomeMotorista;
   final String placaVeiculo;
 
@@ -83,9 +83,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
   }
 
   Future<void> _onNovaPosicao(Position posicao) async {
+    // Integração com o Backend Java
     final sucesso = await ApiService.enviarPosicao(
-    cpf: widget.cpfMotorista,
-    nome: widget.nomeMotorista,
+      cpf: widget.cpfMotorista,
+      nome: widget.nomeMotorista,
       placaVeiculo: widget.placaVeiculo,
       latitude: posicao.latitude,
       longitude: posicao.longitude,
@@ -107,6 +108,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
       }
     });
 
+    // Move o mapa para a nova posição do motorista
     _mapController.move(
       LatLng(posicao.latitude, posicao.longitude),
       _mapController.camera.zoom,
@@ -139,7 +141,8 @@ class _TelaMotoristaState extends State<TelaMotorista> {
               children: [
                 Center(
                   child: Container(
-                    width: 40, height: 4,
+                    width: 40,
+                    height: 4,
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(2),
@@ -184,8 +187,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                 ),
                 const SizedBox(height: 4),
                 Text('Selecione o motivo ou descreva abaixo',
-                    style:
-                        TextStyle(fontSize: 13, color: Colors.grey[600])),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                 const SizedBox(height: 16),
                 Wrap(
                   spacing: 8,
@@ -305,21 +307,19 @@ class _TelaMotoristaState extends State<TelaMotorista> {
     return Scaffold(
       body: Column(
         children: [
-          // ── Header customizado ─────────────────────────────────
+          // Header Customizado
           Container(
             color: const Color(0xFF1565C0),
             child: SafeArea(
               bottom: false,
               child: Column(
                 children: [
-                  // Barra superior
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
                     child: Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.white),
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.pop(context),
                         ),
                         const Text(
@@ -331,7 +331,6 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                           ),
                         ),
                         const Spacer(),
-                        // Badge de status
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 5),
@@ -345,7 +344,8 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                width: 7, height: 7,
+                                width: 7,
+                                height: 7,
                                 decoration: BoxDecoration(
                                   color: _rastreando
                                       ? const Color(0xFF69F0AE)
@@ -367,24 +367,19 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 12),
-
-                  // Card do motorista
                   Container(
                     margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.12),
-                      border: Border.all(
-                          color: Colors.white.withOpacity(0.2)),
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16)),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     child: Row(
                       children: [
-                        // Avatar
                         Container(
                           width: 46,
                           height: 46,
@@ -396,7 +391,6 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                               color: Colors.white, size: 26),
                         ),
                         const SizedBox(width: 12),
-                        // Nome e cargo
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,13 +407,11 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                               const Text(
                                 'Motorista • Em rota',
                                 style: TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 12),
+                                    color: Colors.white60, fontSize: 12),
                               ),
                             ],
                           ),
                         ),
-                        // Placa em destaque
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
@@ -445,7 +437,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
             ),
           ),
 
-          // ── Corpo: mapa + overlays ─────────────────────────────
+          // Mapa + Overlays
           Expanded(
             child: Stack(
               children: [
@@ -478,8 +470,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                                   ? Colors.orange[700]
                                   : const Color(0xFF1565C0),
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.white, width: 2.5),
+                              border: Border.all(color: Colors.white, width: 2.5),
                               boxShadow: const [
                                 BoxShadow(
                                     color: Colors.black38,
@@ -487,10 +478,8 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                                     offset: Offset(0, 2))
                               ],
                             ),
-                            child: const Icon(
-                                Icons.directions_bus_rounded,
-                                color: Colors.white,
-                                size: 26),
+                            child: const Icon(Icons.directions_bus_rounded,
+                                color: Colors.white, size: 26),
                           ),
                         ),
                       ]),
@@ -500,7 +489,9 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                 // Banner de atraso ativo
                 if (temAtraso)
                   Positioned(
-                    top: 0, left: 0, right: 0,
+                    top: 0,
+                    left: 0,
+                    right: 0,
                     child: Container(
                       color: Colors.orange[700],
                       padding: const EdgeInsets.symmetric(
@@ -520,8 +511,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () =>
-                                setState(() => _motivoAtraso = null),
+                            onTap: () => setState(() => _motivoAtraso = null),
                             child: const Icon(Icons.close,
                                 color: Colors.white, size: 18),
                           ),
@@ -530,7 +520,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     ),
                   ),
 
-                // Card de status
+                // Card de status flutuante
                 Positioned(
                   bottom: 100,
                   left: 12,
@@ -548,12 +538,8 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                         children: [
                           Row(children: [
                             Icon(
-                              _rastreando
-                                  ? Icons.sensors
-                                  : Icons.sensors_off,
-                              color: _rastreando
-                                  ? Colors.green
-                                  : Colors.grey,
+                              _rastreando ? Icons.sensors : Icons.sensors_off,
+                              color: _rastreando ? Colors.green : Colors.grey,
                               size: 18,
                             ),
                             const SizedBox(width: 6),
@@ -569,8 +555,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                               icon: Icons.location_on,
                               label: 'Posição',
                               value:
-                                  '${_ultimaPosicao!.latitude.toStringAsFixed(5)}, '
-                                  '${_ultimaPosicao!.longitude.toStringAsFixed(5)}',
+                                  '${_ultimaPosicao!.latitude.toStringAsFixed(5)}, ${_ultimaPosicao!.longitude.toStringAsFixed(5)}',
                             ),
                             _InfoRow(
                               icon: Icons.speed,
@@ -587,8 +572,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                             _InfoRow(
                               icon: Icons.bar_chart,
                               label: 'Envios',
-                              value:
-                                  '✅ $_enviosComSucesso  ❌ $_enviosFalhos',
+                              value: '✅ $_enviosComSucesso  ❌ $_enviosFalhos',
                             ),
                           ],
                         ],
@@ -601,8 +585,6 @@ class _TelaMotoristaState extends State<TelaMotorista> {
           ),
         ],
       ),
-
-      // ── FABs ──────────────────────────────────────────────────
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -612,8 +594,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
             onPressed: _abrirBottomSheetAtraso,
             backgroundColor:
                 temAtraso ? Colors.orange[700] : Colors.orange[50],
-            foregroundColor:
-                temAtraso ? Colors.white : Colors.orange[800],
+            foregroundColor: temAtraso ? Colors.white : Colors.orange[800],
             elevation: temAtraso ? 6 : 2,
             icon: Icon(
               temAtraso
@@ -622,31 +603,23 @@ class _TelaMotoristaState extends State<TelaMotorista> {
               size: 20,
             ),
             label: Text(
-              temAtraso
-                  ? 'Atraso: $_motivoAtraso'
-                  : 'Informar Atraso',
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: 12),
+              temAtraso ? 'Atraso: $_motivoAtraso' : 'Informar Atraso',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ),
           const SizedBox(height: 10),
           FloatingActionButton.extended(
             heroTag: 'rastrear',
             onPressed: _toggleRastreamento,
-            backgroundColor: _rastreando
-                ? Colors.red[700]
-                : const Color(0xFF1565C0),
+            backgroundColor:
+                _rastreando ? Colors.red[700] : const Color(0xFF1565C0),
             foregroundColor: Colors.white,
             icon: Icon(
-              _rastreando
-                  ? Icons.stop_circle_outlined
-                  : Icons.play_circle_outline,
+              _rastreando ? Icons.stop_circle_outlined : Icons.play_circle_outline,
               size: 28,
             ),
             label: Text(
-              _rastreando
-                  ? 'Parar Rastreamento'
-                  : 'Iniciar Rastreamento',
+              _rastreando ? 'Parar Rastreamento' : 'Iniciar Rastreamento',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
@@ -679,8 +652,7 @@ class _InfoRow extends StatelessWidget {
             style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         Expanded(
           child: Text(value,
-              style: const TextStyle(
-                  fontSize: 12, fontWeight: FontWeight.w600)),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
         ),
       ]),
     );
