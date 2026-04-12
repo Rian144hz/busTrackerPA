@@ -7,6 +7,9 @@ import 'package:latlong2/latlong.dart';
 import '../service/api_service.dart';
 import '../service/location_service.dart';
 
+/// Lista constante com os motivos de atraso pré-definidos que o motorista pode selecionar.
+/// Cada item é um Map contendo o ícone (IconData) e o texto do motivo (String).
+/// Esses valores aparecem como botões clicáveis no bottom sheet de atraso.
 const List<Map<String, dynamic>> _atrasosPreDefinidos = [
   {'icone': Icons.tire_repair, 'motivo': 'Pneu furado'},
   {'icone': Icons.traffic, 'motivo': 'Trânsito intenso'},
@@ -16,6 +19,15 @@ const List<Map<String, dynamic>> _atrasosPreDefinidos = [
   {'icone': Icons.child_care, 'motivo': 'Aguardando aluno'},
 ];
 
+/// Tela principal do motorista para rastreamento do veículo em tempo real.
+///
+/// Esta tela exibe um mapa com a localização atual, permite iniciar/parar o envio
+/// automático de coordenadas para o servidor, e permite informar motivos de atraso.
+///
+/// Recebe como parâmetros obrigatórios:
+/// - [cpfMotorista]: CPF do motorista logado (usado para identificar no backend)
+/// - [nomeMotorista]: Nome exibido no cabeçalho da tela
+/// - [placaVeiculo]: Placa do veículo sendo rastreado
 class TelaMotorista extends StatefulWidget {
   final int cpfMotorista;
   final String nomeMotorista;
@@ -32,28 +44,75 @@ class TelaMotorista extends StatefulWidget {
   State<TelaMotorista> createState() => _TelaMotoristaState();
 }
 
+/// Classe de estado que mantém todos os dados dinâmicos da tela do motorista.
+///
+/// Gerencia o estado do rastreamento (ligado/desligado), armazena a posição atual,
+/// contadores de envio, mensagens de status e o motivo de atraso atual.
 class _TelaMotoristaState extends State<TelaMotorista> {
+  /// Coordenadas padrão do centro do mapa quando ainda não há localização do GPS.
+  /// Usado como ponto inicial (Paulo Afonso - BA).
   static const _pauloAfonso = LatLng(-9.4062, -38.2144);
+
+  /// Intervalo em segundos entre cada envio de coordenadas para o servidor.
+  /// Define de quanto em quanto tempo a posição será enviada ao backend.
   static const _intervaloSegundos = 10;
 
+  /// Instância do serviço de localização que gerencia o GPS em background.
+  /// Responsável por solicitar permissões e obter atualizações de posição.
   final LocationService _locationService = LocationService();
+
+  /// Controlador do mapa que permite movimentar e controlar a visualização programaticamente.
+  /// Usado para centralizar o mapa na posição atual do veículo quando atualizada.
   final MapController _mapController = MapController();
 
+  /// Flag que indica se o rastreamento está ativo ou não.
+  /// Quando true, o GPS está sendo monitorado e enviando dados ao servidor.
   bool _rastreando = false;
+
+  /// Última posição recebida do GPS.
+  /// Pode ser null se ainda não houver nenhuma leitura de localização.
   Position? _ultimaPosicao;
+
+  /// Mensagem atual exibida no card de status para informar o motorista sobre o estado.
+  /// Ex: "Iniciando GPS...", "Posição enviada", "Falha ao enviar", etc.
   String _statusMsg = 'Aguardando início do rastreamento...';
+
+  /// Contador de quantas vezes o envio da posição foi bem-sucedido.
+  /// Exibido no card de status para acompanhamento do motorista.
   int _enviosComSucesso = 0;
+
+  /// Contador de quantas vezes o envio da posição falhou.
+  /// Exibido no card de status para alertar sobre problemas de conexão.
   int _enviosFalhos = 0;
+
+  /// Data/hora do último envio bem-sucedido de coordenadas.
+  /// Exibido no card de status para o motorista saber quando foi a última atualização.
   DateTime? _ultimoEnvio;
+
+  /// Motivo atual do atraso informado pelo motorista.
+  /// Quando preenchido, é exibido um banner laranjo no topo e enviado ao servidor.
+  /// Pode ser null quando não há atraso informado.
   String? _motivoAtraso;
 
+  /// Método chamado automaticamente quando o widget é removido da árvore.
+  ///
+  /// Para o rastreamento do GPS para economizar bateria e liberar recursos.
+  /// Importante para evitar que o GPS continue ativo mesmo após sair da tela.
   @override
   void dispose() {
     _locationService.pararRastreamento();
     super.dispose();
   }
 
+  /// Alterna o estado do rastreamento entre ligado e desligado.
+  ///
+  /// Quando chamado:
+  /// - Se estiver rastreando: para o rastreamento e atualiza o estado
+  /// - Se não estiver rastreando: solicita permissão de localização e inicia o rastreamento
+  ///
+  /// Mostra um SnackBar se a permissão for negada pelo usuário.
   Future<void> _toggleRastreamento() async {
+    // Se já está rastreando, para o serviço e atualiza o estado visual
     if (_rastreando) {
       _locationService.pararRastreamento();
       setState(() {
@@ -63,27 +122,41 @@ class _TelaMotoristaState extends State<TelaMotorista> {
       return;
     }
 
+    // Solicita permissão de localização ao usuário (GPS)
     final permissao = await LocationService.solicitarPermissao();
     if (!permissao) {
+      // Usuário negou a permissão - mostra mensagem de erro
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('❌ Permissão de localização negada.')),
       );
       return;
     }
 
+    // Atualiza a interface para indicar que está iniciando
     setState(() {
       _rastreando = true;
       _statusMsg = '🔄 Iniciando GPS...';
     });
 
+    // Inicia o serviço de rastreamento com callback para receber atualizações
     _locationService.iniciarRastreamento(
       intervaloSegundos: _intervaloSegundos,
       onPosicaoAtualizada: _onNovaPosicao,
     );
   }
 
+  /// Callback chamado automaticamente sempre que uma nova posição do GPS é recebida.
+  ///
+  /// Este método é invocado pelo LocationService a cada [intervaloSegundos] segundos.
+  /// Ele envia os dados para o backend Java via API e atualiza a interface com:
+  /// - A nova posição no mapa
+  /// - Contadores de sucesso/falha
+  /// - Mensagem de status apropriada
+  ///
+  /// [posicao] é o objeto Position do Geolocator com latitude, longitude, velocidade, etc.
   Future<void> _onNovaPosicao(Position posicao) async {
-    // Integração com o Backend Java
+    // Envia os dados da posição para o backend Java via HTTP POST
+    // Inclui o motivo de atraso se houver um informado
     final sucesso = await ApiService.enviarPosicao(
       cpf: widget.cpfMotorista,
       nome: widget.nomeMotorista,
@@ -94,41 +167,56 @@ class _TelaMotoristaState extends State<TelaMotorista> {
       motivoAtraso: _motivoAtraso,
     );
 
+    // Atualiza o estado da tela com a nova posição e resultado do envio
     setState(() {
       _ultimaPosicao = posicao;
       _ultimoEnvio = DateTime.now();
       if (sucesso) {
+        // Envio bem-sucedido - incrementa contador e mostra mensagem apropriada
         _enviosComSucesso++;
         _statusMsg = _motivoAtraso != null
             ? '⚠️ Atraso enviado: $_motivoAtraso'
             : '✅ Posição enviada ao servidor';
       } else {
+        // Falha no envio - incrementa contador de falhas e alerta o usuário
         _enviosFalhos++;
         _statusMsg = '⚠️ Falha ao enviar — tentando novamente...';
       }
     });
 
-    // Move o mapa para a nova posição do motorista
+    // Centraliza o mapa na nova posição do motorista mantendo o zoom atual
     _mapController.move(
       LatLng(posicao.latitude, posicao.longitude),
       _mapController.camera.zoom,
     );
   }
 
+  /// Abre o painel inferior (bottom sheet) para o motorista informar um atraso.
+  ///
+  /// Este método exibe um modal deslizante com:
+  /// - Chips/botões com motivos pré-definidos (pneu furado, trânsito, etc)
+  /// - Campo de texto para motivo personalizado
+  /// - Botão para limpar o atraso caso já exista um
+  ///
+  /// Usa StatefulBuilder para atualizar o bottom sheet sem afetar a tela principal.
   void _abrirBottomSheetAtraso() {
+    // Controller para capturar o texto digitado pelo usuário
     final customCtrl = TextEditingController();
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      isScrollControlled: true, // Permite que o bottom sheet acompanhe o teclado
+      backgroundColor: Colors.transparent, // Deixa o fundo transparente para ver o conteúdo atrás
       builder: (_) => StatefulBuilder(
+        // StatefulBuilder permite usar setState dentro do bottom sheet
         builder: (ctx, setSheetState) {
           return Container(
+            // Container branco com bordas arredondadas no topo
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
+            // Padding ajustado para não ficar escondido pelo teclado
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom + 24,
               top: 8,
@@ -136,9 +224,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
               right: 20,
             ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.min, // Ocupa apenas o espaço necessário
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Indicador visual (linha cinza) no topo do bottom sheet
                 Center(
                   child: Container(
                     width: 40,
@@ -150,8 +239,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Cabeçalho com ícone, título e botão de limpar (se houver atraso)
                 Row(
                   children: [
+                    // Container com ícone de alerta
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -162,13 +253,16 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                           color: Colors.orange[700], size: 20),
                     ),
                     const SizedBox(width: 10),
+                    // Título "Informar Atraso"
                     const Text('Informar Atraso',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     const Spacer(),
+                    // Botão "Limpar" só aparece se já houver um atraso informado
                     if (_motivoAtraso != null)
                       TextButton.icon(
                         onPressed: () {
+                          // Remove o atraso e fecha o bottom sheet
                           setState(() => _motivoAtraso = null);
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -186,17 +280,20 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                   ],
                 ),
                 const SizedBox(height: 4),
+                // Subtítulo explicativo
                 Text('Selecione o motivo ou descreva abaixo',
                     style: TextStyle(fontSize: 13, color: Colors.grey[600])),
                 const SizedBox(height: 16),
+                // Grid/linha com chips dos motivos pré-definidos
                 Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
+                  spacing: 8, // Espaço horizontal entre os chips
+                  runSpacing: 8, // Espaço vertical entre as linhas
                   children: _atrasosPreDefinidos.map((item) {
                     final motivo = item['motivo'] as String;
                     final icone = item['icone'] as IconData;
                     final selecionado = _motivoAtraso == motivo;
                     return GestureDetector(
+                      // Ao tocar em um chip, define esse motivo e fecha
                       onTap: () {
                         setSheetState(() => customCtrl.clear());
                         setState(() => _motivoAtraso = motivo);
@@ -208,6 +305,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                           ),
                         );
                       },
+                      // Chip animado que muda de cor quando selecionado
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 150),
                         padding: const EdgeInsets.symmetric(
@@ -247,14 +345,16 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                   }).toList(),
                 ),
                 const SizedBox(height: 20),
-                const Divider(),
+                const Divider(), // Linha divisória
                 const SizedBox(height: 12),
+                // Seção de motivo personalizado
                 Text('Ou descreva outro motivo',
                     style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey[600],
                         fontWeight: FontWeight.w500)),
                 const SizedBox(height: 8),
+                // Campo de texto para motivo customizado
                 TextField(
                   controller: customCtrl,
                   textCapitalization: TextCapitalization.sentences,
@@ -268,10 +368,11 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                   ),
                 ),
                 const SizedBox(height: 12),
+                // Botão para confirmar o motivo personalizado
                 ElevatedButton.icon(
                   onPressed: () {
                     final texto = customCtrl.text.trim();
-                    if (texto.isEmpty) return;
+                    if (texto.isEmpty) return; // Não faz nada se vazio
                     setState(() => _motivoAtraso = texto);
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -299,29 +400,44 @@ class _TelaMotoristaState extends State<TelaMotorista> {
     );
   }
 
+  /// Constrói a interface visual da tela do motorista.
+  ///
+  /// Estrutura da tela:
+  /// - Header azul com nome, placa e indicador de status
+  /// - Mapa que ocupa a maior parte da tela
+  /// - Banner de atraso (condicional)
+  /// - Card flutuante com informações de status
+  /// - Botões flutuantes para atraso e rastreamento
   @override
   Widget build(BuildContext context) {
+    // Formatador de data para exibir horário no formato HH:mm:ss
     final fmt = DateFormat('HH:mm:ss');
+    // Flag auxiliar para verificar se há um atraso informado
     final temAtraso = _motivoAtraso != null;
 
     return Scaffold(
       body: Column(
         children: [
-          // Header Customizado
+          // ============================================
+          // HEADER CUSTOMIZADO (parte superior azul)
+          // ============================================
           Container(
-            color: const Color(0xFF1565C0),
+            color: const Color(0xFF1565C0), // Azul primário
             child: SafeArea(
-              bottom: false,
+              bottom: false, // Não aplica padding na parte inferior
               child: Column(
                 children: [
+                  // Linha superior: botão voltar, título e indicador de status
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
                     child: Row(
                       children: [
+                        // Botão de voltar para a tela anterior
                         IconButton(
                           icon: const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.pop(context),
                         ),
+                        // Título da tela
                         const Text(
                           'Rastreamento',
                           style: TextStyle(
@@ -330,7 +446,8 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Spacer(),
+                        const Spacer(), // Empurra o próximo widget para a direita
+                        // Indicador visual "Ativo" ou "Parado"
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 5),
@@ -343,13 +460,14 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              // Bolinha verde se ativo, cinza se parado
                               Container(
                                 width: 7,
                                 height: 7,
                                 decoration: BoxDecoration(
                                   color: _rastreando
-                                      ? const Color(0xFF69F0AE)
-                                      : Colors.white38,
+                                      ? const Color(0xFF69F0AE) // Verde
+                                      : Colors.white38, // Cinza
                                   shape: BoxShape.circle,
                                 ),
                               ),
@@ -368,6 +486,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     ),
                   ),
                   const SizedBox(height: 12),
+                  // Cartão com informações do motorista e veículo
                   Container(
                     margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                     padding: const EdgeInsets.symmetric(
@@ -380,6 +499,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     ),
                     child: Row(
                       children: [
+                        // Ícone do motorista (círculo com ícone de pessoa)
                         Container(
                           width: 46,
                           height: 46,
@@ -391,6 +511,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                               color: Colors.white, size: 26),
                         ),
                         const SizedBox(width: 12),
+                        // Nome e função do motorista
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,17 +533,18 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                             ],
                           ),
                         ),
+                        // Placa do veículo (destaque amarelo)
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFD600),
+                            color: const Color(0xFFFFD600), // Amarelo
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             widget.placaVeiculo,
                             style: const TextStyle(
-                              color: Color(0xFF1A237E),
+                              color: Color(0xFF1A237E), // Azul escuro
                               fontSize: 14,
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1.5,
@@ -437,24 +559,29 @@ class _TelaMotoristaState extends State<TelaMotorista> {
             ),
           ),
 
-          // Mapa + Overlays
+          // ============================================
+          // MAPA + OVERLAYS (parte principal)
+          // ============================================
           Expanded(
             child: Stack(
               children: [
+                // Widget do mapa OpenStreetMap
                 FlutterMap(
-                  mapController: _mapController,
+                  mapController: _mapController, // Controlador para mover o mapa
                   options: const MapOptions(
-                    initialCenter: _pauloAfonso,
-                    initialZoom: 14.0,
-                    minZoom: 5.0,
-                    maxZoom: 19.0,
+                    initialCenter: _pauloAfonso, // Centro inicial do mapa
+                    initialZoom: 14.0, // Zoom inicial
+                    minZoom: 5.0, // Zoom mínimo
+                    maxZoom: 19.0, // Zoom máximo
                   ),
                   children: [
+                    // Camada de tiles (imagens do mapa) do OpenStreetMap
                     TileLayer(
                       urlTemplate:
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'br.com.rastreamento.escolar',
                     ),
+                    // Camada de marcadores - só mostra se houver posição
                     if (_ultimaPosicao != null)
                       MarkerLayer(markers: [
                         Marker(
@@ -466,6 +593,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                           height: 48,
                           child: Container(
                             decoration: BoxDecoration(
+                              // Cor muda se tiver atraso (laranja) ou não (azul)
                               color: temAtraso
                                   ? Colors.orange[700]
                                   : const Color(0xFF1565C0),
@@ -486,7 +614,9 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                   ],
                 ),
 
-                // Banner de atraso ativo
+                // ============================================
+                // BANNER DE ATRASO (só aparece se tiver atraso)
+                // ============================================
                 if (temAtraso)
                   Positioned(
                     top: 0,
@@ -510,6 +640,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                                   fontSize: 13),
                             ),
                           ),
+                          // Botão X para remover o atraso
                           GestureDetector(
                             onTap: () => setState(() => _motivoAtraso = null),
                             child: const Icon(Icons.close,
@@ -520,13 +651,15 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     ),
                   ),
 
-                // Card de status flutuante
+                // ============================================
+                // CARD DE STATUS FLUTUANTE (informações técnicas)
+                // ============================================
                 Positioned(
-                  bottom: 100,
+                  bottom: 100, // Acima dos FABs
                   left: 12,
                   right: 12,
                   child: Card(
-                    elevation: 8,
+                    elevation: 8, // Sombra
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
                     child: Padding(
@@ -536,6 +669,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Linha com ícone e mensagem de status
                           Row(children: [
                             Icon(
                               _rastreando ? Icons.sensors : Icons.sensors_off,
@@ -549,26 +683,31 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                                       fontWeight: FontWeight.w600)),
                             ),
                           ]),
+                          // Informações técnicas (só aparecem após primeira posição)
                           if (_ultimaPosicao != null) ...[
                             const Divider(height: 16),
+                            // Coordenadas da última posição
                             _InfoRow(
                               icon: Icons.location_on,
                               label: 'Posição',
                               value:
                                   '${_ultimaPosicao!.latitude.toStringAsFixed(5)}, ${_ultimaPosicao!.longitude.toStringAsFixed(5)}',
                             ),
+                            // Velocidade em km/h (convertida de m/s)
                             _InfoRow(
                               icon: Icons.speed,
                               label: 'Velocidade',
                               value:
                                   '${(_ultimaPosicao!.speed * 3.6).toStringAsFixed(1)} km/h',
                             ),
+                            // Hora do último envio
                             if (_ultimoEnvio != null)
                               _InfoRow(
                                 icon: Icons.access_time,
                                 label: 'Último envio',
                                 value: fmt.format(_ultimoEnvio!),
                               ),
+                            // Contadores de envios
                             _InfoRow(
                               icon: Icons.bar_chart,
                               label: 'Envios',
@@ -585,17 +724,23 @@ class _TelaMotoristaState extends State<TelaMotorista> {
           ),
         ],
       ),
+
+      // ============================================
+      // BOTÕES FLUTUANTES (FABs) na lateral direita
+      // ============================================
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Botão para informar/remover atraso
           FloatingActionButton.extended(
-            heroTag: 'atraso',
+            heroTag: 'atraso', // Tag única para animação de hero
             onPressed: _abrirBottomSheetAtraso,
+            // Cor muda se tiver atraso informado
             backgroundColor:
                 temAtraso ? Colors.orange[700] : Colors.orange[50],
             foregroundColor: temAtraso ? Colors.white : Colors.orange[800],
-            elevation: temAtraso ? 6 : 2,
+            elevation: temAtraso ? 6 : 2, // Mais sombra se ativo
             icon: Icon(
               temAtraso
                   ? Icons.warning_amber_rounded
@@ -607,10 +752,12 @@ class _TelaMotoristaState extends State<TelaMotorista> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 10), // Espaço entre os botões
+          // Botão principal: Iniciar/Parar rastreamento
           FloatingActionButton.extended(
             heroTag: 'rastrear',
             onPressed: _toggleRastreamento,
+            // Cor muda conforme estado: azul (parado) ou vermelho (rastreando)
             backgroundColor:
                 _rastreando ? Colors.red[700] : const Color(0xFF1565C0),
             foregroundColor: Colors.white,
@@ -630,6 +777,15 @@ class _TelaMotoristaState extends State<TelaMotorista> {
   }
 }
 
+/// Widget auxiliar reutilizável para exibir uma linha de informação
+/// com ícone, label e valor formatado.
+///
+/// Usado no card de status para mostrar dados como posição, velocidade, etc.
+///
+/// Parâmetros:
+/// - [icon]: Ícone à esquerda da linha
+/// - [label]: Texto descritivo (ex: "Posição", "Velocidade")
+/// - [value]: Valor a ser exibido (ex: "-9.40620, -38.21440")
 class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
