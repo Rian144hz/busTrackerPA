@@ -5,9 +5,14 @@ import java.time.LocalDateTime;
 
 // ── Request DTO (recebido do App Flutter) ─────────────────────
 public record PosicaoRequestDTO(
+        Long id,
+        long cpf,
+        String nome,
         String placaVeiculo,
         BigDecimal latitude,
         BigDecimal longitude,
-        BigDecimal velocidade   // opcional; app pode enviar null
+        BigDecimal velocidade,
+         String motivoAtraso
+        
 ) {}
 

@@ -1,26 +1,15 @@
-package br.com.rastreamento.escolar.model;
+package br.com.rastreamento.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-/**
- * Entidade JPA que mapeia a tabela 'posicoes'.
- * Representa um registro de localização enviado pelo app do motorista.
- */
 @Entity
-@Table(
-        name = "posicoes",
-        indexes = {
-                @Index(name = "idx_posicoes_placa_timestamp",
-                        columnList = "placa_veiculo, timestamp DESC")
-        }
-)
+@Table(name = "atrasos")
 @Data
 @Builder
 @NoArgsConstructor
@@ -30,6 +19,12 @@ public class PosicaoVeiculo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private Long cpf;
+
+    @Column(nullable = false, length = 100)
+    private String nome;
 
     @Column(name = "placa_veiculo", nullable = false, length = 10)
     private String placaVeiculo;
@@ -43,10 +38,12 @@ public class PosicaoVeiculo {
     @Column(precision = 5, scale = 2)
     private BigDecimal velocidade;
 
+    @Column(columnDefinition = "TEXT")
+    private String motivoAtraso;
+
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    /** Garante que o timestamp seja preenchido antes de persistir. */
     @PrePersist
     public void prePersist() {
         if (this.timestamp == null) {
