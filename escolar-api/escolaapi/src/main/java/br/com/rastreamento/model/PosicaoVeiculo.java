@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Entidade JPA representando um registro de posicao GPS de um veiculo.
+ * Mapeada para a tabela "atrasos".
+ */
 @Entity
 @Table(name = "atrasos")
 @Data
@@ -44,6 +48,9 @@ public class PosicaoVeiculo {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
+    /**
+     * Define o timestamp automaticamente se nao informado.
+     */
     @PrePersist
     public void prePersist() {
         if (this.timestamp == null) {

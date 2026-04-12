@@ -9,12 +9,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repositorio para operacoes de persistencia da entidade PosicaoVeiculo.
+ */
 @Repository
 public interface PosicaoVeiculoRepository
         extends JpaRepository<PosicaoVeiculo, Long> {
 
     /**
-     * Busca a posição mais recente de um veículo pela placa.
+     * Busca a posicao mais recente de um veiculo pela placa.
+     *
+     * @param placa placa do veiculo
+     * @return Optional com a posicao mais recente
      */
     @Query("""
         SELECT p FROM PosicaoVeiculo p
@@ -27,8 +33,9 @@ public interface PosicaoVeiculoRepository
     );
 
     /**
-     * Busca todos os registros que possuem motivo de atraso,
-     * ordenando pelos mais recentes.
+     * Lista registros com motivo de atraso, ordenados do mais recente.
+     *
+     * @return lista de posicoes com atraso
      */
     List<PosicaoVeiculo> findByMotivoAtrasoIsNotNullOrderByTimestampDesc();
 }

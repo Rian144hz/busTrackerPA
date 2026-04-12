@@ -5,25 +5,30 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Configuracao de inicializacao do Firebase Cloud Messaging.
+ * Executada automaticamente apos a construcao do bean.
+ */
 @Configuration
 public class FirebaseConfig {
 
+    /**
+     * Inicializa o Firebase com as credenciais do serviceAccountKey.json.
+     * Executado automaticamente apos a injecao de dependencias.
+     */
     @PostConstruct
     public void init() {
         try {
             InputStream serviceAccount = null;
 
-            // Tentativa 1: ClassPath (O padrão)
             serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
 
-            // Tentativa 2: Se a 1 falhar, tenta caminho direto no disco
             if (serviceAccount == null) {
                 File file = new File("src/main/resources/serviceAccountKey.json");
                 if (file.exists()) {
@@ -32,7 +37,7 @@ public class FirebaseConfig {
             }
 
             if (serviceAccount == null) {
-                throw new IOException("Arquivo não encontrado em nenhum dos caminhos.");
+                throw new IOException("Arquivo serviceAccountKey.json nao encontrado.");
             }
 
             FirebaseOptions options = FirebaseOptions.builder()
@@ -41,12 +46,11 @@ public class FirebaseConfig {
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
-                System.out.println("🚀 Firebase inicializado com sucesso!");
+                System.out.println("Firebase inicializado com sucesso");
             }
         } catch (IOException e) {
-            System.err.println("❌ ERRO CRÍTICO: " + e.getMessage());
-            // Esse comando abaixo vai mostrar a pasta onde o Java está tentando rodar
-            System.out.println("Diretório atual do Java: " + System.getProperty("user.dir"));
+            System.err.println("Erro ao inicializar Firebase: " + e.getMessage());
+            System.out.println("Diretorio atual: " + System.getProperty("user.dir"));
         }
     }
 }

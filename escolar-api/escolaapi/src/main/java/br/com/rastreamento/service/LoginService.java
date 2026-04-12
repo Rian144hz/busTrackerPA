@@ -11,15 +11,22 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Service responsavel pela logica de autenticacao.
+ * Valida credenciais de pais e motoristas.
+ */
 @Service
 @RequiredArgsConstructor
 public class LoginService {
 
     private final AlunoRepository alunoRepository;
+    private final MotoristaRepository motoristaRepository;
 
     /**
-     * Valida matrícula + nome do responsável.
-     * Retorna os dados do aluno se válido, empty se inválido.
+     * Valida credenciais do responsavel e retorna dados do aluno.
+     *
+     * @param dto credenciais de login (matricula e nome do responsavel)
+     * @return Optional com dados do aluno se valido, ou empty se invalido
      */
     public Optional<LoginPaiResponseDTO> loginPai(LoginPaiRequestDTO dto) {
         return alunoRepository
@@ -34,13 +41,13 @@ public class LoginService {
                         a.getPlacaVeiculo()
                 ));
     }
-    
-
-    private final MotoristaRepository motoristaRepository;
 
     /**
-     * Valida CPF + nome + placa do motorista.
-     * Retorna os dados do motorista se válido, empty se inválido.
+     * Valida credenciais do motorista.
+     * Verifica CPF, nome e placa do veiculo.
+     *
+     * @param dto credenciais de login (cpf, nome e placa)
+     * @return Optional com dados do motorista se valido, ou empty se invalido
      */
     public Optional<LoginMotoristaResponseDTO> loginMotorista(
             LoginMotoristaRequestDTO dto) {

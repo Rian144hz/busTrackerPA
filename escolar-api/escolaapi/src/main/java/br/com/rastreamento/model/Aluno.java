@@ -4,9 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entidade JPA representando um aluno matriculado no sistema.
+ * Mapeada para a tabela "alunos".
+ */
 @Entity
 @Table(name = "alunos")
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Aluno {
 
     @Id
@@ -31,6 +38,10 @@ public class Aluno {
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 
+    /**
+     * Preenche campos automaticamente antes da persistencia.
+     * Executado pelo JPA antes do INSERT.
+     */
     @PrePersist
     public void prePersist() {
         if (this.criadoEm == null) this.criadoEm = LocalDateTime.now();

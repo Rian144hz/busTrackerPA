@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsavel pela logica de rastreamento.
+ * Processa e persiste posicoes GPS, gerencia notificacoes.
+ */
 @Service
 @RequiredArgsConstructor
 public class RastreamentoService {
@@ -18,8 +22,13 @@ public class RastreamentoService {
     private final PosicaoVeiculoRepository repository;
     private final FirebaseService firebaseService;
 
+    /**
+     * Persiste uma nova posicao GPS e dispara notificacao se houver atraso.
+     *
+     * @param dto dados da posicao recebidos do app
+     * @return DTO com a posicao salva
+     */
     public PosicaoResponseDTO salvarPosicao(PosicaoRequestDTO dto) {
-        // 1. Converte DTO para a Model
         PosicaoVeiculo entidade = PosicaoVeiculo.builder()
                 .cpf(dto.cpf())
                 .nome(dto.nome())
@@ -30,10 +39,8 @@ public class RastreamentoService {
                 .motivoAtraso(dto.motivoAtraso())
                 .build();
 
-        // 2. Salva no Postgres (Tabela atrasos)
         PosicaoVeiculo salvo = repository.save(entidade);
 
-        // 3. Dispara Notificação se houver motivo
         if (dto.motivoAtraso() != null && !dto.motivoAtraso().isBlank()) {
             firebaseService.enviarNotificacaoAtraso(dto.placaVeiculo(), dto.motivoAtraso());
         }
@@ -41,20 +48,45 @@ public class RastreamentoService {
         return toResponse(salvo);
     }
 
+    /**
+     * Busca a ultima posicao registrada de um veiculo.
+     *
+     * @param placa placa do veiculo
+     * @return Optional com a posicao mais recente
+     */
     public Optional<PosicaoResponseDTO> buscarUltimaPosicao(String placa) {
         return repository.findUltimaPosicaoByPlaca(placa).map(this::toResponse);
     }
 
-    private PosicaoResponseDTO toResponse(PosicaoVeiculo p) {
-        return new PosicaoResponseDTO(
-                p.getId(), p.getCpf(), p.getNome(), p.getPlacaVeiculo(),
-                p.getLatitude(), p.getLongitude(), p.getVelocidade(), p.getTimestamp()
-        );
-    }
+    /**
+     * Lista todos os registros com motivo de atraso preenchido.
+     *
+     * @return lista de posicoes ordenadas da mais recente para a mais antiga
+     */
     public List<PosicaoResponseDTO> listarAtrasos() {
         return repository.findByMotivoAtrasoIsNotNullOrderByTimestampDesc()
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Converte entidade PosicaoVeiculo para DTO de resposta.
+     * Converte CPF de Long para String.
+     *
+     * @param p entidade a ser convertida
+     * @return DTO equivalente
+     */
+    private PosicaoResponseDTO toResponse(PosicaoVeiculo p) {
+        return new PosicaoResponseDTO(
+                p.getId(),
+                String.valueOf(p.getCpf()),
+                p.getNome(),
+                p.getPlacaVeiculo(),
+                p.getLatitude(),
+                p.getLongitude(),
+                p.getVelocidade(),
+                p.getTimestamp()
+        );
     }
 }
