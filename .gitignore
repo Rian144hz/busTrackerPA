@@ -1,0 +1,130 @@
+# ===============
+# FLUTTER / DART
+# ===============
+
+# Flutter/Dart build artifacts
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.packages
+.pub-cache/
+.pub/
+
+# iOS/Android build artifacts
+ios/Flutter/.last_build_id
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/ephemeral/
+ios/Pods/
+ios/.symlinks/
+ios/Runner/GeneratedPluginRegistrant.h
+ios/Runner/GeneratedPluginRegistrant.m
+android/.gradle/
+android/app/debug/
+android/app/profile/
+android/app/release/
+*.apk
+*.aab
+*.ipa
+
+# Web build artifacts
+web/.dart_tool/
+web/build/
+
+# Windows build artifacts
+windows/flutter/ephemeral/
+windows/build/
+
+# macOS build artifacts
+macos/Flutter/ephemeral/
+macos/build/
+macos/Pods/
+
+# Linux build artifacts
+linux/flutter/ephemeral/
+linux/build/
+
+# Coverage
+coverage/
+.test_coverage.dart
+*.lcov
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# ===============
+# JAVA / MAVEN
+# ===============
+
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===============
+# IDE
+# ===============
+
+# IntelliJ / Android Studio
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# ===============
+# SENSITIVE / SECRETS
+# ===============
+
+# Android keystore
+*.jks
+*.keystore
+key.properties
+android/local.properties
+
+# iOS signing
+ios/Runner/GoogleService-Info.plist
+
+# Firebase
+android/app/google-services.json
+GoogleService-Info.plist
+google-services.json
+firebase-service-account.json
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# ===============
+# OS FILES
+# ===============
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===============
+# LOGS
+# ===============
+
+*.log
+logs/
