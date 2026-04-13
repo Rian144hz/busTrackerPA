@@ -76,15 +76,17 @@ class AuthService {
     required String nomeResponsavel,
   }) async {
     try {
-      // Faz requisição POST ao endpoint de autenticação do pai
-      final response = await http.post(
-        Uri.parse('$_baseUrl/pai'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'matricula': matricula,
-          'nomeResponsavel': nomeResponsavel,
-        }),
-      );
+      // Faz requisição POST ao endpoint de autenticação do pai com timeout
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/pai'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'matricula': matricula,
+              'nomeResponsavel': nomeResponsavel,
+            }),
+          )
+          .timeout(TimingConstants.httpTimeout);
 
       // Verifica se autenticação foi bem-sucedida (HTTP 200 OK)
       if (response.statusCode == 200) {
@@ -158,16 +160,18 @@ class AuthService {
     required String placaVeiculo,
   }) async {
     try {
-      // Faz requisição POST ao endpoint de autenticação do motorista
-      final response = await http.post(
-        Uri.parse('$_baseUrl/motorista'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'cpf': cpf,
-          'nome': nome,
-          'placaVeiculo': placaVeiculo,
-        }),
-      );
+      // Faz requisição POST ao endpoint de autenticação do motorista com timeout
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/motorista'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'cpf': cpf,
+              'nome': nome,
+              'placaVeiculo': placaVeiculo,
+            }),
+          )
+          .timeout(TimingConstants.httpTimeout);
 
       // Verifica se autenticação foi bem-sucedida (HTTP 200 OK)
       if (response.statusCode == 200) {

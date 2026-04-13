@@ -177,6 +177,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
       motivoAtraso: motivoParaEnvio,
     );
 
+    // IMPORTANTE: Verifica se o widget ainda está montado antes de atualizar estado
+    // Evita erro se o motorista saiu da tela enquanto a requisição rodava
+    if (!mounted) return;
+
     // Atualiza o estado da tela com a nova posição e resultado do envio
     setState(() {
       _ultimaPosicao = posicao;

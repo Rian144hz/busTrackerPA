@@ -82,12 +82,12 @@ class ApiService {
     }
 
     try {
-      // Faz a requisição POST com o corpo JSON
+      // Faz a requisição POST com timeout para evitar travamento
       final response = await http.post(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(bodyMap),
-      );
+      ).timeout(TimingConstants.httpTimeout);
 
       // Verifica se o servidor retornou sucesso (201 Created)
       if (response.statusCode == 201) {
@@ -150,8 +150,10 @@ class ApiService {
     final uri = Uri.parse('$baseUrl/veiculo/$placa/ultima-posicao');
 
     try {
-      // Faz a requisição GET (sem corpo)
-      final response = await http.get(uri);
+      // Faz a requisição GET com timeout para evitar travamento
+      final response = await http
+          .get(uri)
+          .timeout(TimingConstants.httpTimeout);
 
       // Verifica se encontrou o registro (200 OK)
       if (response.statusCode == 200) {

@@ -147,7 +147,10 @@ class _TelaPaiState extends State<TelaPai> {
         );
 
         // Adiciona ao rastro se for um ponto novo (evita duplicados)
-        if (_rastro.isEmpty || _rastro.last != ponto) {
+        // Compara coordenadas em vez de referência do objeto
+        if (_rastro.isEmpty ||
+            (_rastro.last.latitude != ponto.latitude ||
+             _rastro.last.longitude != ponto.longitude)) {
           _rastro.add(ponto);
           // Remove o ponto mais antigo se exceder o limite máximo
           if (_rastro.length > _maxRastro) _rastro.removeAt(0);
