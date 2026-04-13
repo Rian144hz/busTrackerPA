@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../service/api_service.dart';
+import '../constants.dart';
 
 /// Tela do responsável/pai para acompanhar o ônibus em tempo real.
 ///
@@ -43,15 +44,15 @@ class TelaPai extends StatefulWidget {
 class _TelaPaiState extends State<TelaPai> {
   /// Coordenadas padrão do centro do mapa quando ainda não há dados do servidor.
   /// Centro em Paulo Afonso - BA.
-  static const _pauloAfonso = LatLng(-9.4062, -38.2144);
+  static final _pauloAfonso = LocationConstants.defaultLocation;
 
   /// Intervalo em segundos entre cada consulta ao servidor.
   /// Define a frequência de atualização da posição do ônibus.
-  static const _intervaloSegundos = 10;
+  static const _intervaloSegundos = TimingConstants.updateIntervalSeconds;
 
   /// Número máximo de pontos do rastro a serem mantidos na memória.
   /// Limita o histórico para evitar consumo excessivo de memória.
-  static const _maxRastro = 30;
+  static const _maxRastro = TimingConstants.maxRastroPoints;
 
   /// Controlador do mapa que permite movimentar e controlar a visualização programaticamente.
   /// Usado para centralizar o mapa na posição do ônibus quando atualizada.
@@ -407,7 +408,7 @@ class _TelaPaiState extends State<TelaPai> {
                 // Widget do mapa OpenStreetMap
                 FlutterMap(
                   mapController: _mapController,
-                  options: const MapOptions(
+                  options: MapOptions(
                     initialCenter: _pauloAfonso, // Centro inicial
                     initialZoom: 14.0, // Zoom inicial
                     minZoom: 5.0, // Zoom mínimo

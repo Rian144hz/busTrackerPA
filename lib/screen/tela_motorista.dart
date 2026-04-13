@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 
 import '../service/api_service.dart';
 import '../service/location_service.dart';
+import '../constants.dart';
 
 /// Lista constante com os motivos de atraso pré-definidos que o motorista pode selecionar.
 /// Cada item é um Map contendo o ícone (IconData) e o texto do motivo (String).
@@ -51,11 +52,11 @@ class TelaMotorista extends StatefulWidget {
 class _TelaMotoristaState extends State<TelaMotorista> {
   /// Coordenadas padrão do centro do mapa quando ainda não há localização do GPS.
   /// Usado como ponto inicial (Paulo Afonso - BA).
-  static const _pauloAfonso = LatLng(-9.4062, -38.2144);
+  static final _pauloAfonso = LocationConstants.defaultLocation;
 
   /// Intervalo em segundos entre cada envio de coordenadas para o servidor.
   /// Define de quanto em quanto tempo a posição será enviada ao backend.
-  static const _intervaloSegundos = 10;
+  static const _intervaloSegundos = TimingConstants.updateIntervalSeconds;
 
   /// Instância do serviço de localização que gerencia o GPS em background.
   /// Responsável por solicitar permissões e obter atualizações de posição.
@@ -592,7 +593,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                 // Widget do mapa OpenStreetMap
                 FlutterMap(
                   mapController: _mapController, // Controlador para mover o mapa
-                  options: const MapOptions(
+                  options: MapOptions(
                     initialCenter: _pauloAfonso, // Centro inicial do mapa
                     initialZoom: 14.0, // Zoom inicial
                     minZoom: 5.0, // Zoom mínimo

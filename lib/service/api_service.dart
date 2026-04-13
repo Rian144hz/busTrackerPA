@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../constants.dart';
+
 /// Serviço responsável por toda comunicação HTTP com o Backend Java.
 ///
 /// Esta classe centraliza todas as chamadas à API REST do servidor,
@@ -16,8 +18,7 @@ class ApiService {
   ///
   /// Usa ngrok para expor o servidor local durante desenvolvimento.
   /// Em produção, deve ser substituída pelo domínio real.
-  static const String baseUrl =
-      'https://uncast-apparently-kyson.ngrok-free.dev/api/v1/rastreamento';
+  static const String baseUrl = ApiConstants.trackingBaseUrl;
 
   // ===========================================================================
   // ENVIO DE POSIÇÃO (MOTORISTA → SERVIDOR)

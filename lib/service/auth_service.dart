@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../constants.dart';
+
 /// Serviço de autenticação responsável por validar credenciais de usuários.
 ///
 /// Esta classe gerencia o login de dois perfis distintos:
@@ -20,8 +22,7 @@ class AuthService {
   ///
   /// Usa ngrok durante desenvolvimento. Em produção, deve ser
   /// substituída pelo domínio real do backend.
-  static const _baseUrl =
-      'https://uncast-apparently-kyson.ngrok-free.dev/api/v1/auth';
+  static const _baseUrl = ApiConstants.authBaseUrl;
 
   // ===========================================================================
   // LOGIN DO PAI/RESPONSÁVEL

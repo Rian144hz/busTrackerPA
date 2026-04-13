@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'screen/tela_selecao_perfil.dart';
+import 'constants.dart';
 
 // =============================================================================
 // HANDLER DE BACKGROUND (NOTIFICAÇÕES EM SEGUNDO PLANO)
@@ -104,15 +105,15 @@ Future<void> main() async {
     // INSCRIÇÃO EM TÓPICO (RECEBER ALERTAS ESPECÍFICOS)
     // =============================================================================
 
-    // Inscreve o dispositivo no tópico "onibus_paulo_afonso".
+    // Inscreve o dispositivo no tópico FCM para notificações de ônibus.
     // Isso permite que o backend Java envie notificações para TODOS os
     // dispositivos inscritos neste tópico de uma só vez (broadcast).
     //
     // O motorista pode informar um atraso, e o backend envia uma notificação
     // push para todos os pais/responsáveis inscritos neste tópico.
-    await messaging.subscribeToTopic("onibus_paulo_afonso");
+    await messaging.subscribeToTopic(FirebaseConstants.fcmTopic);
     // ignore: avoid_print
-    print("🚀 Inscrito no tópico: onibus_paulo_afonso");
+    print("🚀 Inscrito no tópico: ${FirebaseConstants.fcmTopic}");
   }
   // Nota: Se o usuário negar a permissão, o app funcionará normalmente,
   // mas não receberá notificações push em background.
