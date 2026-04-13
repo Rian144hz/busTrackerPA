@@ -94,6 +94,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
   /// Pode ser null quando não há atraso informado.
   String? _motivoAtraso;
 
+  /// Flag que indica se o atraso atual já foi enviado ao servidor.
+  /// Evita envios duplicados da mesma notificacao.
+  bool _atrasoJaNotificado = false;
+
   /// Método chamado automaticamente quando o widget é removido da árvore.
   ///
   /// Para o rastreamento do GPS para economizar bateria e liberar recursos.
@@ -155,8 +159,13 @@ class _TelaMotoristaState extends State<TelaMotorista> {
   ///
   /// [posicao] é o objeto Position do Geolocator com latitude, longitude, velocidade, etc.
   Future<void> _onNovaPosicao(Position posicao) async {
+    // So envia o motivo de atraso se houver um E ainda nao tiver sido notificado
+    // Isso evita notificacoes duplicadas para o mesmo atraso
+    final motivoParaEnvio = (_motivoAtraso != null && !_atrasoJaNotificado)
+        ? _motivoAtraso
+        : null;
+
     // Envia os dados da posição para o backend Java via HTTP POST
-    // Inclui o motivo de atraso se houver um informado
     final sucesso = await ApiService.enviarPosicao(
       cpf: widget.cpfMotorista,
       nome: widget.nomeMotorista,
@@ -164,7 +173,7 @@ class _TelaMotoristaState extends State<TelaMotorista> {
       latitude: posicao.latitude,
       longitude: posicao.longitude,
       velocidade: posicao.speed,
-      motivoAtraso: _motivoAtraso,
+      motivoAtraso: motivoParaEnvio,
     );
 
     // Atualiza o estado da tela com a nova posição e resultado do envio
@@ -174,9 +183,15 @@ class _TelaMotoristaState extends State<TelaMotorista> {
       if (sucesso) {
         // Envio bem-sucedido - incrementa contador e mostra mensagem apropriada
         _enviosComSucesso++;
-        _statusMsg = _motivoAtraso != null
-            ? '⚠️ Atraso enviado: $_motivoAtraso'
-            : '✅ Posição enviada ao servidor';
+
+        // Se enviou atraso com sucesso, marca como notificado e limpa
+        if (motivoParaEnvio != null) {
+          _atrasoJaNotificado = true;
+          _motivoAtraso = null; // Limpa para evitar reenvio
+          _statusMsg = '✅ Atraso notificado: $motivoParaEnvio';
+        } else {
+          _statusMsg = '✅ Posição enviada ao servidor';
+        }
       } else {
         // Falha no envio - incrementa contador de falhas e alerta o usuário
         _enviosFalhos++;
@@ -262,8 +277,11 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     if (_motivoAtraso != null)
                       TextButton.icon(
                         onPressed: () {
-                          // Remove o atraso e fecha o bottom sheet
-                          setState(() => _motivoAtraso = null);
+                          // Remove o atraso, reseta a flag e fecha o bottom sheet
+                          setState(() {
+                            _motivoAtraso = null;
+                            _atrasoJaNotificado = false; // Reseta para permitir novo atraso futuro
+                          });
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -293,10 +311,13 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     final icone = item['icone'] as IconData;
                     final selecionado = _motivoAtraso == motivo;
                     return GestureDetector(
-                      // Ao tocar em um chip, define esse motivo e fecha
+                      // Ao tocar em um chip, define esse motivo, reseta flag e fecha
                       onTap: () {
                         setSheetState(() => customCtrl.clear());
-                        setState(() => _motivoAtraso = motivo);
+                        setState(() {
+                          _motivoAtraso = motivo;
+                          _atrasoJaNotificado = false; // Novo atraso, permite notificar
+                        });
                         Navigator.pop(ctx);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -373,7 +394,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                   onPressed: () {
                     final texto = customCtrl.text.trim();
                     if (texto.isEmpty) return; // Não faz nada se vazio
-                    setState(() => _motivoAtraso = texto);
+                    setState(() {
+                      _motivoAtraso = texto;
+                      _atrasoJaNotificado = false; // Novo atraso, permite notificar
+                    });
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -642,7 +666,10 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                           ),
                           // Botão X para remover o atraso
                           GestureDetector(
-                            onTap: () => setState(() => _motivoAtraso = null),
+                            onTap: () => setState(() {
+                              _motivoAtraso = null;
+                              _atrasoJaNotificado = false; // Reseta para permitir novo atraso
+                            }),
                             child: const Icon(Icons.close,
                                 color: Colors.white, size: 18),
                           ),
