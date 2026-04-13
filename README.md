@@ -275,7 +275,7 @@ Evidência técnica do túnel HTTP recebendo requisições `POST` originadas da 
 
 **Passo 1 — Clonagem do repositório:**
 ```bash
-git clone https://github.com/seu-usuario/bustrackerpa.git
+git clone https://github.com/rian144hz/bustrackerpa.git
 cd bustrackerpa/escolar-api/escolaapi
 ```
 
