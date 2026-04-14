@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:vibration/vibration.dart';
 
 import '../service/api_service.dart';
 import '../service/location_service.dart';
@@ -317,7 +318,11 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                     final selecionado = _motivoAtraso == motivo;
                     return GestureDetector(
                       // Ao tocar em um chip, define esse motivo, reseta flag e fecha
-                      onTap: () {
+                      onTap: () async {
+                        // Vibra o celular ao selecionar um atraso
+                        if (await Vibration.hasVibrator() ?? false) {
+                          Vibration.vibrate(duration: 200);
+                        }
                         setSheetState(() => customCtrl.clear());
                         setState(() {
                           _motivoAtraso = motivo;
@@ -396,9 +401,13 @@ class _TelaMotoristaState extends State<TelaMotorista> {
                 const SizedBox(height: 12),
                 // Botão para confirmar o motivo personalizado
                 ElevatedButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     final texto = customCtrl.text.trim();
                     if (texto.isEmpty) return; // Não faz nada se vazio
+                    // Vibra o celular ao confirmar atraso personalizado
+                    if (await Vibration.hasVibrator() ?? false) {
+                      Vibration.vibrate(duration: 200);
+                    }
                     setState(() {
                       _motivoAtraso = texto;
                       _atrasoJaNotificado = false; // Novo atraso, permite notificar

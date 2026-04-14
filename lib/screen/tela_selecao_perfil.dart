@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'tela_motorista.dart';
 import 'tela_pai.dart';
 import '../service/auth_service.dart';
@@ -174,6 +175,12 @@ class _DialogMotoristaState extends State<_DialogMotorista> {
   bool _carregando = false;
   String? _erro;
 
+  // Formatter para máscara de CPF (000.000.000-00)
+  final _cpfFormatter = MaskTextInputFormatter(
+    mask: '###.###.###-##',
+    filter: {'#': RegExp(r'[0-9]')},
+  );
+
   @override
   void initState() {
     super.initState();
@@ -274,6 +281,7 @@ class _DialogMotoristaState extends State<_DialogMotorista> {
           TextField(
             controller: _cpfCtrl,
             keyboardType: TextInputType.number,
+            inputFormatters: [_cpfFormatter],
             decoration: InputDecoration(
               labelText: 'CPF',
               hintText: 'Ex: 123.456.789-00',
