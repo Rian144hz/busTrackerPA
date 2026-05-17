@@ -72,7 +72,7 @@ A plataforma é estruturada em três camadas desacopladas, assegurando escalabil
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### 🛰️ Ciclo de Telemetria e Eventos
+### Ciclo de Telemetria e Eventos
 
 1.  **Captura:** O aplicativo do motorista coleta coordenadas espaciais via GPS do aparelho utilizando a taxa de amostragem definida pelo serviço local.
 2.  **Processamento:** O backend Java valida o payload, persiste o histórico espaço-temporal no banco de dados e analisa anomalias operacionais.
@@ -80,7 +80,7 @@ A plataforma é estruturada em três camadas desacopladas, assegurando escalabil
 
 ---
 
-## 🛠️ Stack Tecnológica
+## Stack Tecnológica
 
 ### Frontend Mobile (Flutter)
 * **Geolocalização:** `geolocator` para interface nativa de alta precisão com o hardware de GPS.
@@ -99,7 +99,7 @@ A plataforma é estruturada em três camadas desacopladas, assegurando escalabil
 
 ---
 
-## 🗺️ Roadmap de Evolução
+## Roadmap de Evolução
 
 * [ ] **Cálculo de ETA Avançado:** Algoritmo preditivo de tempo estimado com base na velocidade média móvel e matriz de distância.
 * [ ] **Cercas Virtuais (Geofencing):** Alertas push automáticos quando o veículo cruzar raios de proximidade de pontos pré-definidos.
