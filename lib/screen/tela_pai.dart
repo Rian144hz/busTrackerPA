@@ -8,17 +8,7 @@ import '../service/api_service.dart';
 import '../constants.dart';
 
 /// Tela do responsável/pai para acompanhar o ônibus em tempo real.
-///
-/// Esta tela exibe um mapa mostrando a localização atual do veículo,
-/// o trajeto percorrido (rastro), informações de velocidade e tempo estimado
-/// de chegada, além de alertas de atraso.
-///
-/// Atualiza automaticamente a cada [_intervaloSegundos] segundos via polling.
-///
-/// Recebe como parâmetros obrigatórios:
-/// - [nomeResponsavel]: Nome do pai/responsável que está visualizando
-/// - [nomeAluno]: Nome do aluno sendo acompanhado
-/// - [placaVeiculo]: Placa do veículo a ser rastreado
+/// Estilizada conforme o protótipo de alta fidelidade em tons Dark Blue.
 class TelaPai extends StatefulWidget {
   final String nomeResponsavel;
   final String nomeAluno;
@@ -35,61 +25,25 @@ class TelaPai extends StatefulWidget {
   State<TelaPai> createState() => _TelaPaiState();
 }
 
-/// Classe de estado que gerencia todos os dados dinâmicos da tela do pai.
-///
-/// Responsável por:
-/// - Buscar periodicamente a posição do ônibus no servidor
-/// - Manter o histórico de posições (rastro) para desenhar a rota
-/// - Atualizar a interface com informações de velocidade, atraso, etc.
 class _TelaPaiState extends State<TelaPai> {
-  /// Coordenadas padrão do centro do mapa quando ainda não há dados do servidor.
-  /// Centro em Paulo Afonso - BA.
   static final _pauloAfonso = LocationConstants.defaultLocation;
-
-  /// Intervalo em segundos entre cada consulta ao servidor.
-  /// Define a frequência de atualização da posição do ônibus.
   static const _intervaloSegundos = TimingConstants.updateIntervalSeconds;
-
-  /// Número máximo de pontos do rastro a serem mantidos na memória.
-  /// Limita o histórico para evitar consumo excessivo de memória.
   static const _maxRastro = TimingConstants.maxRastroPoints;
 
-  /// Controlador do mapa que permite movimentar e controlar a visualização programaticamente.
-  /// Usado para centralizar o mapa na posição do ônibus quando atualizada.
   final MapController _mapController = MapController();
-
-  /// Timer que executa a busca de posição periodicamente em background.
-  /// É criado em [initState] e cancelado em [dispose].
   Timer? _timer;
-
-  /// Mapa com os dados da posição atual recebidos do servidor.
-  /// Contém: latitude, longitude, velocidade, motivoAtraso, etc.
-  /// É null quando ainda não houve nenhuma resposta do servidor.
   Map<String, dynamic>? _posicaoAtual;
-
-  /// Lista de coordenadas que representa o trajeto percorrido pelo ônibus.
-  /// Usada para desenhar a linha da rota no mapa (polyline).
-  /// Mantém no máximo [_maxRastro] pontos (FIFO - primeiro a entrar, primeiro a sair).
   final List<LatLng> _rastro = [];
-
-  /// Data/hora da última atualização bem-sucedida dos dados do servidor.
-  /// Exibido no card de informações para o pai saber se os dados estão atualizados.
   DateTime? _ultimaAtualizacao;
-
-  /// Flag que indica se está carregando os dados pela primeira vez.
-  /// Controla a exibição do indicador de progresso circular.
   bool _carregando = true;
-
-  /// Motivo do atraso recebido do servidor (informado pelo motorista).
-  /// Quando preenchido, exibe um banner laranja de alerta no topo do mapa.
-  /// Pode ser null ou vazio quando não há atraso.
   String? _motivoAtraso;
 
-  /// Método chamado automaticamente quando o widget é inserido na árvore.
-  ///
-  /// Inicia o processo de busca de dados:
-  /// 1. Faz a primeira busca imediata (_buscarPosicao)
-  /// 2. Configura um timer para buscar a cada [_intervaloSegundos] segundos
+  // Cores do protótipo enviado na imagem
+  static const Color _corFundoHeader = Color(0xFF1B254B); // Azul escuro do fundo
+  static const Color _corCardInterno = Color(0xFF283563); // Azul levemente mais claro para o container interno
+  static const Color _corIndicadorVivo = Color(0xFF4ADE80); // Verde vibrante do "Ao vivo"
+  static const Color _corLinhaRastro = Color(0xFF3F69FF); // Azul brilhante da rota
+
   @override
   void initState() {
     super.initState();
@@ -100,183 +54,116 @@ class _TelaPaiState extends State<TelaPai> {
     );
   }
 
-  /// Método chamado automaticamente quando o widget é removido da árvore.
-  ///
-  /// Cancela o timer para parar as requisições ao servidor e liberar recursos.
-  /// Importante para evitar memory leaks e requisições desnecessárias.
   @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
 
-  /// Busca a última posição do ônibus no servidor via API.
-  ///
-  /// Este método é chamado:
-  /// - Uma vez no initState (primeira carga)
-  /// - Periodicamente a cada [_intervaloSegundos] segundos pelo Timer
-  ///
-  /// Atualiza o estado com:
-  /// - [_posicaoAtual]: Dados completos recebidos do servidor
-  /// - [_ultimaAtualizacao]: Horário desta busca
-  /// - [_motivoAtraso]: Se o motorista informou algum atraso
-  /// - [_rastro]: Adiciona novo ponto à rota, limitando a [_maxRastro] pontos
-  ///
-  /// Também move o mapa automaticamente para a nova posição do ônibus.
   Future<void> _buscarPosicao() async {
-    // Consulta o backend Java pela última posição conhecida desta placa
     final dados = await ApiService.buscarUltimaPosicao(widget.placaVeiculo);
 
-    // Verifica se o widget ainda está montado antes de chamar setState
-    // (evita erro se o usuário saiu da tela enquanto a requisição rodava)
     if (!mounted) return;
 
     setState(() {
-      _carregando = false; // Remove o indicador de carregamento
+      _carregando = false;
 
       if (dados != null) {
-        // Resposta bem-sucedida - atualiza todos os dados
         _posicaoAtual = dados;
         _ultimaAtualizacao = DateTime.now();
         _motivoAtraso = dados['motivoAtraso'] as String?;
 
-        // Cria um objeto LatLng com as coordenadas recebidas
         final ponto = LatLng(
           (dados['latitude'] as num).toDouble(),
           (dados['longitude'] as num).toDouble(),
         );
 
-        // Adiciona ao rastro se for um ponto novo (evita duplicados)
-        // Compara coordenadas em vez de referência do objeto
         if (_rastro.isEmpty ||
             (_rastro.last.latitude != ponto.latitude ||
              _rastro.last.longitude != ponto.longitude)) {
           _rastro.add(ponto);
-          // Remove o ponto mais antigo se exceder o limite máximo
           if (_rastro.length > _maxRastro) _rastro.removeAt(0);
         }
 
-        // Centraliza o mapa na posição do ônibus mantendo o zoom atual
         _mapController.move(ponto, _mapController.camera.zoom);
       }
     });
   }
 
-  /// Calcula uma estimativa de chegada baseada na velocidade atual.
-  ///
-  /// Fórmula: tempo = (distância / velocidade) * 60 minutos
-  /// Assume uma distância fixa de 2.5 km até o destino.
-  ///
-  /// Retorna:
-  /// - String formatada como "Aprox. X min" se estiver se movendo
-  /// - "Parado" se a velocidade for menor que 1 km/h
-  /// - "--" se não houver dados de posição
   String _estimativaChegada() {
     if (_posicaoAtual == null) return '--';
-
-    // Converte velocidade de m/s para km/h
-    final vel =
-        ((_posicaoAtual!['velocidade'] as num?)?.toDouble() ?? 0) * 3.6;
-
+    final vel = ((_posicaoAtual!['velocidade'] as num?)?.toDouble() ?? 0) * 3.6;
     if (vel < 1) return 'Parado';
-
-    // Distância fixa assumida até o destino (em km)
     const distanciaKm = 2.5;
-
-    // Calcula tempo em minutos: (km / km/h) * 60 = minutos
     final min = (distanciaKm / vel * 60).round();
-
-    return 'Aprox. $min min';
+    return '~$min min';
   }
 
-  /// Constrói a interface visual da tela do responsável.
-  ///
-  /// Estrutura da tela:
-  /// - Header verde com nome do aluno, responsável e indicador de status
-  /// - Mapa que ocupa a maior parte da tela
-  /// - Banner de atraso (condicional - só aparece se motorista informou)
-  /// - Indicador de carregamento (condicional)
-  /// - Mensagem de ônibus não iniciado (condicional)
-  /// - Card flutuante com métricas (velocidade, chegada, pontos)
-  /// - Botão flutuante para centralizar no ônibus
   @override
   Widget build(BuildContext context) {
-    // Formatador de data para exibir horário no formato HH:mm:ss
     final fmt = DateFormat('HH:mm:ss');
-
-    // Acesso rápido aos dados da posição atual
     final pos = _posicaoAtual;
-
-    // Calcula velocidade em km/h (converte de m/s)
     final vel = (((pos?['velocidade']) as num?)?.toDouble() ?? 0) * 3.6;
-
-    // Flag que indica se há um atraso informado pelo motorista
     final temAtraso = _motivoAtraso != null && _motivoAtraso!.isNotEmpty;
 
     return Scaffold(
+      backgroundColor: _corFundoHeader,
       body: Column(
         children: [
           // ============================================
-          // HEADER CUSTOMIZADO (parte superior verde)
+          // HEADER DESIGN PREMIUM (Azul Escuro Noturno)
           // ============================================
           Container(
-            color: const Color(0xFF2E7D32), // Verde escuro
+            color: _corFundoHeader,
+            padding: const EdgeInsets.only(bottom: 16),
             child: SafeArea(
-              bottom: false, // Não aplica padding na parte inferior
+              bottom: false,
               child: Column(
                 children: [
-                  // Linha superior: botão voltar, título e indicador de status
+                  // Linha Superior: Voltar, Título e Badge "Ao Vivo"
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
+                    padding: const EdgeInsets.fromLTRB(8, 8, 16, 12),
                     child: Row(
                       children: [
-                        // Botão de voltar para a tela anterior
                         IconButton(
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.white),
+                          icon: const Icon(Icons.arrow_back, color: Colors.white),
                           onPressed: () => Navigator.pop(context),
                         ),
-                        // Título da tela
                         const Text(
                           'Acompanhar Ônibus',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Spacer(), // Empurra o próximo widget para a direita
-                        // Indicador visual "Ao vivo" ou "Aguardando"
+                        const Spacer(),
+                        // Badge Arredondado "Ao vivo" idêntico ao da imagem
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(51), // ~0.2 opacidade
-                            border: Border.all(
-                                color: Colors.white.withAlpha(77)), // ~0.3
+                            color: Colors.white.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // Bolinha verde se tiver dados, cinza se não tiver
                               Container(
-                                width: 7,
-                                height: 7,
-                                decoration: BoxDecoration(
-                                  color: pos != null
-                                      ? const Color(0xFF69F0AE) // Verde
-                                      : Colors.white38, // Cinza
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: _corIndicadorVivo,
                                   shape: BoxShape.circle,
                                 ),
                               ),
-                              const SizedBox(width: 5),
-                              Text(
-                                pos != null ? 'Ao vivo' : 'Aguardando',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'Ao vivo',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
@@ -285,57 +172,49 @@ class _TelaPaiState extends State<TelaPai> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
-
-                  // Cartão com informações do aluno e responsável
+                  // Card de Informações do Aluno e Responsável (Arredondado integrado)
                   Container(
-                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(31), // ~0.12 opacidade
-                      border: Border.all(
-                          color: Colors.white.withAlpha(51)), // ~0.2
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16)),
+                      color: _corCardInterno,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       children: [
-                        // Seção do Aluno (com ícone de escola)
+                        // Seção Aluno
                         Row(
                           children: [
+                            // Ícone da Mochila vermelha (Substituído conforme imagem)
                             Container(
-                              width: 42,
-                              height: 42,
+                              width: 40,
+                              height: 40,
                               decoration: BoxDecoration(
-                                color: Colors.white.withAlpha(51), // ~0.2
-                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.school_rounded,
-                                  color: Colors.white, size: 22),
+                              child: const Icon(Icons.backpack_outlined, color: Colors.redAccent, size: 22),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Label "ALUNO" em letras pequenas
-                                  const Text(
+                                  Text(
                                     'ALUNO',
                                     style: TextStyle(
-                                      color: Colors.white60,
+                                      color: Colors.white.withOpacity(0.4),
                                       fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 1,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
-                                  // Nome do aluno
                                   Text(
                                     widget.nomeAluno,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                 ],
@@ -343,50 +222,42 @@ class _TelaPaiState extends State<TelaPai> {
                             ),
                           ],
                         ),
-
-                        const SizedBox(height: 10),
-                        // Linha divisória sutil
-                        Container(
-                            height: 1,
-                            color: Colors.white.withAlpha(38)), // ~0.15
-                        const SizedBox(height: 10),
-
-                        // Seção do Responsável (com ícone de pessoa)
+                        const SizedBox(height: 12),
+                        // Linha divisória sutil idêntica à imagem
+                        Container(height: 0.5, color: Colors.white.withOpacity(0.1)),
+                        const SizedBox(height: 12),
+                        // Seção Responsável
                         Row(
                           children: [
                             Container(
-                              width: 36,
-                              height: 36,
+                              width: 40,
+                              height: 40,
                               decoration: BoxDecoration(
-                                color: Colors.white.withAlpha(38), // ~0.15
+                                color: Colors.white.withOpacity(0.08),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.person,
-                                  color: Colors.white70, size: 18),
+                              child: Icon(Icons.person_outline, color: Colors.blue[300], size: 22),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Label "RESPONSÁVEL"
-                                  const Text(
+                                  Text(
                                     'RESPONSÁVEL',
                                     style: TextStyle(
-                                      color: Colors.white54,
+                                      color: Colors.white.withOpacity(0.4),
                                       fontSize: 10,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 1,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
-                                  // Nome do responsável
                                   Text(
                                     widget.nomeResponsavel,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
@@ -403,42 +274,36 @@ class _TelaPaiState extends State<TelaPai> {
           ),
 
           // ============================================
-          // CORPO - MAPA + OVERLAYS
+          // CORPO DO MAPA COM ESTILIZAÇÃO ESCURA
           // ============================================
           Expanded(
             child: Stack(
               children: [
-                // Widget do mapa OpenStreetMap
                 FlutterMap(
                   mapController: _mapController,
                   options: MapOptions(
-                    initialCenter: _pauloAfonso, // Centro inicial
-                    initialZoom: 14.0, // Zoom inicial
-                    minZoom: 5.0, // Zoom mínimo
-                    maxZoom: 19.0, // Zoom máximo
+                    initialCenter: _pauloAfonso,
+                    initialZoom: 14.5,
+                    minZoom: 5.0,
+                    maxZoom: 19.0,
                   ),
                   children: [
-                    // Camada de tiles (imagens do mapa) do OpenStreetMap
+                    // Aplicando o filtro CartoDB Dark Matter (Estilo escuro da sua foto)
                     TileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName:
-                          'br.com.rastreamento.escolar',
+                      urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                      subdomains: const ['a', 'b', 'c', 'd'],
+                      userAgentPackageName: 'br.com.rastreamento.escolar',
                     ),
-                    // Camada de polyline - desenha a linha da rota percorrida
-                    // Só desenha se houver pelo menos 2 pontos no rastro
+                    // Rota percorrida (Polyline azul viva)
                     if (_rastro.length > 1)
                       PolylineLayer(polylines: [
                         Polyline(
                           points: _rastro,
-                          strokeWidth: 4.5,
-                          // Cor muda se tiver atraso: laranja (com atraso) ou verde (normal)
-                          color: temAtraso
-                              ? Colors.orange.withAlpha(204) // ~0.8
-                              : Colors.green.withAlpha(191), // ~0.75
+                          strokeWidth: 4.0,
+                          color: _corLinhaRastro,
                         ),
                       ]),
-                    // Camada de marcadores - mostra a posição atual do ônibus
+                    // Marcador do Ônibus (Ícone circular perfeito da imagem)
                     if (pos != null)
                       MarkerLayer(markers: [
                         Marker(
@@ -446,83 +311,47 @@ class _TelaPaiState extends State<TelaPai> {
                             (pos['latitude'] as num).toDouble(),
                             (pos['longitude'] as num).toDouble(),
                           ),
-                          width: 52,
-                          height: 52,
+                          width: 50,
+                          height: 50,
                           child: Container(
                             decoration: BoxDecoration(
-                              // Cor muda se tiver atraso (laranja) ou não (verde)
-                              color: temAtraso
-                                  ? Colors.orange[700]
-                                  : const Color(0xFF2E7D32),
+                              color: const Color(0xFF20336B),
                               shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Colors.white, width: 3),
-                              boxShadow: const [
+                              border: Border.all(color: Colors.white, width: 2.5),
+                              boxShadow: [
                                 BoxShadow(
-                                    color: Colors.black38,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 3))
+                                  color: _corLinhaRastro.withOpacity(0.4),
+                                  blurRadius: 10,
+                                  spreadRadius: 2,
+                                )
                               ],
                             ),
                             child: const Icon(
-                                Icons.directions_bus_rounded,
-                                color: Colors.white,
-                                size: 28),
+                              Icons.directions_bus_rounded,
+                              color: Colors.orangeAccent,
+                              size: 26,
+                            ),
                           ),
                         ),
                       ]),
                   ],
                 ),
 
-                // ============================================
-                // BANNER DE ATRASO (só aparece se tiver atraso)
-                // ============================================
+                // Banner de Atraso Condicional
                 if (temAtraso)
                   Positioned(
                     top: 0, left: 0, right: 0,
                     child: Container(
-                      color: Colors.orange[700],
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
+                      color: Colors.orange[800],
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Row(
                         children: [
-                          // Ícone de alerta em container arredondado
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withAlpha(51), // ~0.2
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                                Icons.warning_amber_rounded,
-                                color: Colors.white,
-                                size: 20),
-                          ),
+                          const Icon(Icons.warning_amber_rounded, color: Colors.white),
                           const SizedBox(width: 10),
-                          // Texto do atraso (título + motivo)
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'ÔNIBUS COM ATRASO',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                                Text(
-                                  _motivoAtraso!,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              'Atraso detectado: $_motivoAtraso',
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -530,117 +359,96 @@ class _TelaPaiState extends State<TelaPai> {
                     ),
                   ),
 
-                // ============================================
-                // INDICADOR DE CARREGAMENTO (só na primeira vez)
-                // ============================================
                 if (_carregando)
-                  const Center(child: CircularProgressIndicator()),
+                  const Center(child: CircularProgressIndicator(color: _corLinhaRastro)),
 
-                // ============================================
-                // MENSAGEM: ÔNIBUS NÃO INICIOU (se não houver dados)
-                // ============================================
                 if (!_carregando && pos == null)
                   Center(
                     child: Card(
+                      color: _corFundoHeader,
                       margin: const EdgeInsets.all(32),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
                       child: const Padding(
                         padding: EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.directions_bus_outlined,
-                                size: 48, color: Colors.grey),
-                            SizedBox(height: 12),
-                            Text(
-                              'Ônibus ainda não iniciou\no rastreamento.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
+                        child: Text(
+                          'Ônibus não iniciou o rastreamento.',
+                          style: TextStyle(color: Colors.white70),
                         ),
                       ),
                     ),
                   ),
 
                 // ============================================
-                // CARD DE MÉTRICAS (velocidade, chegada, pontos)
+                // CARD INFERIOR DE MÉTRICAS (Igual ao Print)
                 // ============================================
                 if (pos != null)
                   Positioned(
-                    bottom: 16, left: 12, right: 12,
-                    child: Card(
-                      elevation: 10, // Sombra elevada
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Linha com 3 métricas principais
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceAround,
-                              children: [
-                                // Métrica: Velocidade
-                                _Metrica(
-                                  icon: Icons.speed,
-                                  valor: vel.toStringAsFixed(0),
-                                  unidade: 'km/h',
-                                  // Cor muda conforme velocidade: verde (lento), laranja (médio), vermelho (rápido)
-                                  cor: vel > 60
-                                      ? Colors.red
-                                      : vel > 40
-                                          ? Colors.orange
-                                          : Colors.green[700]!,
+                    bottom: 24, left: 16, right: 16,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          )
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              // Métrica 1: Velocidade (Ícone de Raio / Lightning)
+                              _MetricaItem(
+                                icon: Icons.bolt_rounded,
+                                iconColor: Colors.amber,
+                                valor: vel.toStringAsFixed(0),
+                                unidade: 'km/h',
+                              ),
+                              // Separador vertical sutil
+                              Container(width: 1, height: 40, color: Colors.grey[200]),
+                              // Métrica 2: Tempo de chegada (Ícone de Cronômetro)
+                              _MetricaItem(
+                                icon: Icons.timer_outlined,
+                                iconColor: Colors.blueGrey,
+                                valor: _estimativaChegada(),
+                                unidade: 'chegada',
+                              ),
+                              // Separador vertical sutil
+                              Container(width: 1, height: 40, color: Colors.grey[200]),
+                              // Métrica 3: Pontos (Ícone de Pin / Location)
+                              _MetricaItem(
+                                icon: Icons.location_on_rounded,
+                                iconColor: Colors.redAccent,
+                                valor: '${_rastro.length}',
+                                unidade: 'pontos',
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Container(height: 1, color: Colors.grey[100]!),
+                          const SizedBox(height: 12),
+                          // Linha do horário de atualização inferior
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.autorenew_rounded, size: 16, color: Colors.blueGrey[300]),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Atualizado: ${_ultimaAtualizacao != null ? fmt.format(_ultimaAtualizacao!) : '--'}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blueGrey[400],
+                                  fontWeight: FontWeight.w500,
                                 ),
-                                // Métrica: Tempo estimado de chegada
-                                _Metrica(
-                                  icon: Icons.timer_outlined,
-                                  valor: _estimativaChegada(),
-                                  unidade: 'chegada',
-                                  // Cor laranja se tiver atraso, azul se normal
-                                  cor: temAtraso
-                                      ? Colors.orange[700]!
-                                      : const Color(0xFF1565C0),
-                                ),
-                                // Métrica: Quantidade de pontos no rastro
-                                _Metrica(
-                                  icon: Icons.route,
-                                  valor: '${_rastro.length}',
-                                  unidade: 'pontos',
-                                  cor: Colors.green[700]!,
-                                ),
-                              ],
-                            ),
-                            const Divider(height: 20),
-                            // Hora da última atualização
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.update,
-                                    size: 14, color: Colors.grey[600]),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Atualizado: ${_ultimaAtualizacao != null ? fmt.format(_ultimaAtualizacao!) : '--'}',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600]),
-                                ),
-                              ],
-                            ),
-                            // Coordenadas em texto pequeno (debug/informativo)
-                            Text(
-                              '${(pos['latitude'] as num).toStringAsFixed(5)}, '
-                              '${(pos['longitude'] as num).toStringAsFixed(5)}',
-                              style: TextStyle(
-                                  fontSize: 11, color: Colors.grey[400]),
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -649,68 +457,70 @@ class _TelaPaiState extends State<TelaPai> {
           ),
         ],
       ),
-
-      // ============================================
-      // BOTÃO FLUTUANTE: Centralizar no ônibus
-      // ============================================
-      // Só aparece se houver posição do ônibus
+      
+      // Botão flutuante minimalista (Estilo Alvo de Mira da imagem)
       floatingActionButton: pos == null
           ? null
-          : FloatingActionButton.small(
-              backgroundColor: temAtraso
-                  ? Colors.orange[700]
-                  : const Color(0xFF2E7D32),
-              foregroundColor: Colors.white,
-              // Ao tocar, centraliza o mapa na posição do ônibus com zoom 15
-              onPressed: () {
-                _mapController.move(
-                  LatLng(
-                    (pos['latitude'] as num).toDouble(),
-                    (pos['longitude'] as num).toDouble(),
-                  ),
-                  15.0, // Zoom nivelado
-                );
-              },
-              child: const Icon(Icons.my_location),
+          : Padding(
+              padding: const EdgeInsets.only(bottom: 120.0), // Ajustado para ficar acima do card branco
+              child: FloatingActionButton(
+                mini: true,
+                backgroundColor: const Color(0xFF283563),
+                foregroundColor: Colors.white,
+                shape: const CircleBorder(),
+                onPressed: () {
+                  _mapController.move(
+                    LatLng(
+                      (pos['latitude'] as num).toDouble(),
+                      (pos['longitude'] as num).toDouble(),
+                    ),
+                    15.5,
+                  );
+                },
+                child: const Icon(Icons.track_changes_rounded, size: 20),
+              ),
             ),
     );
   }
 }
 
-/// Widget auxiliar reutilizável para exibir uma métrica no card inferior.
-///
-/// Mostra um ícone, um valor grande e uma unidade/label abaixo.
-/// Usado para velocidade, tempo de chegada e contador de pontos.
-///
-/// Parâmetros:
-/// - [icon]: Ícone a ser exibido acima do valor
-/// - [valor]: Valor principal (ex: "45", "Aprox. 5 min", "12")
-/// - [unidade]: Texto abaixo do valor (ex: "km/h", "chegada", "pontos")
-/// - [cor]: Cor do ícone e do valor (muda conforme contexto)
-class _Metrica extends StatelessWidget {
+/// Widget interno para as métricas limpas e centralizadas do card inferior.
+class _MetricaItem extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String valor;
   final String unidade;
-  final Color cor;
 
-  const _Metrica({
+  const _MetricaItem({
     required this.icon,
+    required this.iconColor,
     required this.valor,
     required this.unidade,
-    required this.cor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: cor, size: 22),
+        Icon(icon, color: iconColor, size: 24),
         const SizedBox(height: 4),
-        Text(valor,
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: cor)),
-        Text(unidade,
-            style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        Text(
+          valor,
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1B254B),
+          ),
+        ),
+        Text(
+          unidade,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[400],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
