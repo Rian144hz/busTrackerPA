@@ -17,7 +17,7 @@ O **BusTracker PA** mitiga essa vulnerabilidade entregando telemetria em tempo r
 O ecossistema adota uma identidade visual sóbria baseada nas cores institucionais do município, utilizando mapas em modo noturno (*Dark Matter*) para otimizar o contraste e reduzir a fadiga visual dos responsáveis.
 
 <p align="center">
-  <img src="imagens_app.jpg" alt="Demonstração do Aplicativo BusTracker PA" width="100%">
+  <img src="screenshotsapp/imagens_app.jpg" alt="Demonstração do Aplicativo BusTracker PA" width="100%">
 </p>
 
 ### Fluxo Inicial e Cadastro
