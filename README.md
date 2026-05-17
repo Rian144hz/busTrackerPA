@@ -4,7 +4,7 @@ Plataforma Full Stack de rastreamento veicular em tempo real para o transporte e
 
 ---
 
-## 📌 Visão Geral do Problema
+## Visão Geral do Problema
 
 No interior baiano, as famílias que dependem do transporte escolar enfrentam a falta de previsibilidade sobre os horários dos veículos. Isso resulta em tempos de espera excessivos expostos ao clima, atrasos sem aviso prévio e constante apreensão. 
 
@@ -12,25 +12,29 @@ O **BusTracker PA** mitiga essa vulnerabilidade entregando telemetria em tempo r
 
 ---
 
-## 🖥️ Demonstração da Interface
+## Demonstração da Interface
 
 O ecossistema adota uma identidade visual sóbria baseada nas cores institucionais do município, utilizando mapas em modo noturno (*Dark Matter*) para otimizar o contraste e reduzir a fadiga visual dos responsáveis.
 
-### 👥 Fluxo Inicial e Cadastro
+<p align="center">
+  <img src="imagens_app.jpg" alt="Demonstração do Aplicativo BusTracker PA" width="100%">
+</p>
+
+### Fluxo Inicial e Cadastro
 * **Seleção de Perfil:** Separação clara de escopo entre condutores e responsáveis.
 * **Acessibilidade:** Cadastro simplificado focado em identificadores diretos (CPF e Placa do Veículo).
 
-### 🚍 Módulo do Motorista (Transmissão)
+### Módulo do Motorista (Transmissão)
 * **Operação Simplificada:** Interface acionável por um único clique para início do rastreamento.
 * **Tratamento de Anomalias:** Menu nativo para reporte ágil de incidentes com categorias predefinidas (ex: pneu furado, problema mecânico, trânsito lento), notificando a base instantaneamente.
 
-### 🏡 Módulo do Responsável (Monitoramento)
+### Módulo do Responsável (Monitoramento)
 * **Acompanhamento ao Vivo:** Renderização fluida da rota percorrida e vetor de deslocamento.
 * **Robustez de Sinal:** Tratamento visual explícito para perda de conexão ou interrupção de envio pelo veículo.
 
 ---
 
-## 🔬 Validação em Campo
+## Validação em Campo
 
 O Produto Mínimo Viável (MVP) foi validado em ambiente de produção real conectando o **Distrito de Quixaba** ao **Povoado Torquato** em Glória (BA). 
 
@@ -40,7 +44,7 @@ O Produto Mínimo Viável (MVP) foi validado em ambiente de produção real cone
 
 ---
 
-## 🏗️ Arquitetura do Sistema
+## Arquitetura do Sistema
 
 A plataforma é estruturada em três camadas desacopladas, assegurando escalabilidade e fácil manutenção:
 
